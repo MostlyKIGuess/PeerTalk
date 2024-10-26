@@ -2,7 +2,6 @@
 
 import {
   ChatBubble,
-  ChatBubbleAction,
   ChatBubbleAvatar,
   ChatBubbleMessage,
 } from "@/components/ui/chat/chat-bubble";
@@ -10,10 +9,7 @@ import { ChatInput } from "@/components/ui/chat/chat-input";
 import { ChatMessageList } from "@/components/ui/chat/chat-message-list";
 import { Button } from "@/components/ui/button";
 import {
-  CopyIcon,
   CornerDownLeft,
-  RefreshCcw,
-  Volume2,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import Markdown from "react-markdown";
@@ -33,20 +29,7 @@ const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash",
     systemInstruction: "You are a friendly, supportive virtual therapist. Respond naturally to the user, reacting in a way that feels conversational and empathetic, without sounding overly formal or prescriptive. If the user mentions feelings or emotions, reflect on those in a gentle and friendly way. However, if they are joking or using casual language, respond in kind, maintaining a balance between supportiveness and a sense of humor. Encourage them to explore their thoughts when appropriate but keep it light and adaptive to the context they present.Ask questions to the user for them to open up!"
  });
 
-const ChatAiIcons = [
-  {
-    icon: CopyIcon,
-    label: "Copy",
-  },
-  {
-    icon: RefreshCcw,
-    label: "Refresh",
-  },
-  {
-    icon: Volume2,
-    label: "Volume",
-  },
-];
+
 
 interface Message {
   role: "user" | "assistant";
@@ -128,33 +111,7 @@ export default function Home() {
     }
   };
 
-  const handleActionClick = async (action: string, messageIndex: number) => {
-    console.log("Action clicked:", action, "Message index:", messageIndex);
-    if (action === "Refresh") {
-      setIsGenerating(true);
-      try {
-        const message = messages[messageIndex];
-        const result = await model.generateContent(message.content);
-        const aiMessage: Message = { role: "assistant", content: result.response.text() };
-        setMessages((prevMessages) => {
-          const newMessages = [...prevMessages];
-          newMessages[messageIndex] = aiMessage;
-          return newMessages;
-        });
-      } catch (error) {
-        console.error("Error reloading:", error);
-      } finally {
-        setIsGenerating(false);
-      }
-    }
-
-    if (action === "Copy") {
-      const message = messages[messageIndex];
-      if (message && message.role === "assistant") {
-        navigator.clipboard.writeText(message.content);
-      }
-    }
-  };
+  
 
   return (
     <main className="flex h-screen w-full max-w-3xl flex-col items-center mx-auto py-6">
