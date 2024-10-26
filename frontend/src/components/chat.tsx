@@ -200,7 +200,7 @@ export default function Home() {
             </ChatBubble>
           ))}
 
-        {/* Loading */}https://huggingface.co/datasets/dair-ai/emotion
+        {/* Loading */}
         {isGenerating && (
           <ChatBubble variant="received">
             <ChatBubbleAvatar src="" fallback="🤖" />
