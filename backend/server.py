@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import json
@@ -20,6 +20,7 @@ app.add_middleware(
 class Message(BaseModel):
     user_message: str
     ai_response: str
+    previous_ai_message: str
     timestamp: str
 
 # Initialize a list to store messages
@@ -47,6 +48,7 @@ async def send_message(msg: Message):
     new_message = {
         "user_message": msg.user_message,
         "ai_response": response_message,
+        "previous_ai_message": msg.previous_ai_message,
         "timestamp": timestamp
     }
 
