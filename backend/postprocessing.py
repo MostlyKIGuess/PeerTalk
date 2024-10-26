@@ -1,65 +1,11 @@
-[
-    {
-        "user_message": "heyllo",
-        "ai_response": "Hey there! \ud83d\udc4b What's going on today? Anything exciting happening? \n",
-        "timestamp": "2024-10-27T00:28:10.750389"
-    },
-    {
-        "user_message": "heylo",
-        "ai_response": "Hey there! What's going on today? \ud83d\ude0a \n",
-        "timestamp": "2024-10-27T00:29:27.562467"
-    },
-    {
-        "user_message": "i feel like i am gay",
-        "ai_response": "It's okay to feel confused and uncertain about your sexuality. It's a big part of who you are, and it's completely normal to take some time to figure it out.  Do you feel comfortable talking about what's led you to this feeling? It's okay to just share if you want, or we can explore it at your own pace. \ud83d\ude0a \n",
-        "timestamp": "2024-10-27T00:29:33.068325"
-    },
-    {
-        "user_message": "i feel good",
-        "ai_response": "That's great to hear!  What's making you feel good today? \ud83d\ude0a It's always nice to have a good day, so tell me about it! \n",
-        "timestamp": "2024-10-27T00:37:16.567077"
-    },
-    {
-        "user_message": "megathon , music , food",
-        "ai_response": "Ah, the holy trinity! Megathons, music, and food - sounds like a recipe for a fantastic time!  What kind of music gets you pumped for a megathon?  And what's your go-to food for fueling those epic gaming sessions?  Tell me all about it! \ud83c\udfa7\ud83c\udf55\ud83c\udfae \n",
-        "timestamp": "2024-10-27T00:37:36.075509"
-    },
-    {
-        "user_message": "good wbu?",
-        "ai_response": "Hey!  I'm doing well, thanks for asking. How about you?  What's going on in your world today? \ud83d\ude0a \n",
-        "timestamp": "2024-10-27T00:42:58.325791"
-    },
-    {
-        "user_message": "haha",
-        "ai_response": "Haha, what's got you laughing? Spill the beans! \ud83d\ude09 \n",
-        "previous_user_message": "heylo",
-        "timestamp": "2024-10-27T00:47:54.238062"
-    },
-    {
-        "user_message": "nooo",
-        "ai_response": "Aw, what's wrong?  Tell me about it, I'm here to listen. \ud83d\ude0a \n",
-        "previous_user_message": "haha",
-        "timestamp": "2024-10-27T00:48:11.421553"
-    },
-    {
-        "user_message": "hi",
-        "ai_response": "Hey there! \ud83d\udc4b What's on your mind today? \ud83d\ude0a \n",
-        "previous_ai_message": "",
-        "timestamp": "2024-10-27T00:52:13.652256"
-    },
-    {
-        "user_message": "i see",
-        "ai_response": "\"I see\" can mean a lot of things!  What's on your mind?  Tell me more about what you're thinking. \ud83d\ude0a \n",
-        "previous_ai_message": "Hey there! \ud83d\udc4b What's on your mind today? \ud83d\ude0a \n",
-        "timestamp": "2024-10-27T00:52:22.971092"
-    },
-    {
-        "user_message": "nice",
-        "ai_response": "\"Nice\" is a good word!  What's making you feel nice today? \ud83d\ude0a  Tell me more!  \n",
-        "previous_ai_message": "How are you doing?",
-        "timestamp": "2024-10-27T00:53:35.940717"
-    },
-    {
+import google.generativeai as genai
+import os
+import json
+from datetime import datetime
+
+# Example messages
+messages = [
+       {
         "user_message": "hey i am kinda sad ",
         "ai_response": "Hey, I'm sorry to hear that you're feeling sad.  What's got you feeling down?  It's okay to talk about it. Sometimes just getting things out in the open helps, you know? \n",
         "previous_ai_message": "How are you doing?",
@@ -149,4 +95,70 @@
         "previous_ai_message": "Sounds like you're ready for some rest!  \ud83d\ude34  Hope you sleep well and wake up feeling refreshed.  Anything in particular you're looking forward to tomorrow? \n",
         "timestamp": "2024-10-27T03:46:55.730351"
     }
+    # Add additional messages as needed
 ]
+
+# Set up API key (ensure it's added as an environment variable)
+os.environ["API_KEY"] = "AIzaSyAD3Tfv9aCP1G_9CxE4Lkt9riv8z_81gGU"  # Replace with your actual API key
+genai.configure(api_key=os.environ["API_KEY"])
+
+# Initialize sessions list
+sessions = []
+current_session = {
+    "start_time": None,
+    "messages": []
+}
+
+# Function to analyze each message with the Gemini API
+def analyze_with_gemini(user_message, ai_response):
+    model = genai.GenerativeModel("gemini-1.5-flash")
+    response = model.generate_content(prompt=user_message, context=ai_response)
+    
+    # Extract and organize specific metrics
+    polarity = response.get("polarity", "neutral")
+    keywords = response.get("keywords", [])
+    concern_category = response.get("concern_category", "general")
+    intensity_score = response.get("intensity_score", 0)
+    sentiment_shift = response.get("sentiment_shift", "none")
+    
+    return polarity, keywords, concern_category, intensity_score, sentiment_shift
+
+# Process each message
+for msg in messages:
+    if msg.get("previous_ai_message") == "How are you doing?" and current_session["messages"]:
+        # Append the current session and start a new one
+        sessions.append(current_session)
+        current_session = {
+            "start_time": msg["timestamp"],
+            "messages": []
+        }
+
+    user_message = msg["user_message"]
+    ai_response = msg["previous_ai_message"]
+
+    # Call Gemini API for analysis
+    polarity, keywords, category, intensity, sentiment_shift = analyze_with_gemini(user_message, ai_response)
+
+    # Structure message with metrics
+    message_info = {
+        "question": ai_response,
+        "response": user_message,
+        "metrics": {
+            "polarity": polarity,
+            "keywords": keywords,
+            "concern_category": category,
+            "intensity_score": intensity,
+            "sentiment_shift": sentiment_shift
+        }
+    }
+
+    # Add message to the current session
+    current_session["messages"].append(message_info)
+
+# Append the last session if it has messages
+if current_session["messages"]:
+    sessions.append(current_session)
+
+# Output structured sessions data in JSON format
+output = json.dumps({"sessions": sessions}, indent=4)
+print(output)
