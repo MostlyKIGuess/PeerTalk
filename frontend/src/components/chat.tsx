@@ -19,9 +19,19 @@ import { useEffect, useRef, useState } from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import CodeDisplayBlock from "@/components/code-display-block";
-import { HfInference } from "@huggingface/inference";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const hf = new HfInference(process.env.NEXT_PUBLIC_HF_API_KEY);
+
+
+
+const geminiApiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+if (!geminiApiKey) {
+  throw new Error("NEXT_PUBLIC_GEMINI_API_KEY is not defined");
+}
+const genAI = new GoogleGenerativeAI(geminiApiKey);
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash",
+    systemInstruction: "You are a friendly, supportive virtual therapist. Respond naturally to the user, reacting in a way that feels conversational and empathetic, without sounding overly formal or prescriptive. If the user mentions feelings or emotions, reflect on those in a gentle and friendly way. However, if they are joking or using casual language, respond in kind, maintaining a balance between supportiveness and a sense of humor. Encourage them to explore their thoughts when appropriate but keep it light and adaptive to the context they present.Ask questions to the user for them to open up!"
+ });
 
 const ChatAiIcons = [
   {
@@ -73,21 +83,20 @@ export default function Home() {
     setInput("");
     setIsGenerating(true);
 
-    try {
-      const response = await hf.textGeneration({
-        // model: "zementalist/llama-3-8B-chat-psychotherapist",
-        model: "gpt2",
-        inputs: input,
-      });
+    // const promptText = "You are a compassionate and reflective virtual therapist. Guide the user gently through their thoughts and feelings without asking any direct questions. Encourage them to share more by validating their emotions and offering gentle, open-ended reflections. Focus on empathy and active listening, helping the user explore their experiences in a supportive and non-intrusive way. Emphasize phrases like ‘It sounds like…’ or ‘It seems as if...’ to promote a safe, judgment-free environment where they feel heard and understood. ";
+    const modifiedInput = `${input}`;
 
-      const aiMessage: Message = { role: "assistant", content: response.generated_text };
-      setMessages((prevMessages) => [...prevMessages, aiMessage]);
+    try {
+        const result = await model.generateContent(modifiedInput);
+        const aiMessage: Message = { role: "assistant", content: result.response.text() };
+        setMessages((prevMessages) => [...prevMessages, aiMessage]);
     } catch (error) {
-      console.error("Error generating response:", error);
+        console.error("Error generating response:", error);
     } finally {
-      setIsGenerating(false);
+        setIsGenerating(false);
     }
-  };
+};
+
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -104,12 +113,8 @@ export default function Home() {
       setIsGenerating(true);
       try {
         const message = messages[messageIndex];
-        const response = await hf.textGeneration({
-          model: "gpt2",
-          inputs: message.content,
-        });
-
-        const aiMessage: Message = { role: "assistant", content: response.generated_text };
+        const result = await model.generateContent(message.content);
+        const aiMessage: Message = { role: "assistant", content: result.response.text() };
         setMessages((prevMessages) => {
           const newMessages = [...prevMessages];
           newMessages[messageIndex] = aiMessage;
@@ -200,7 +205,7 @@ export default function Home() {
             </ChatBubble>
           ))}
 
-        {/* Loading */}https://huggingface.co/datasets/dair-ai/emotion
+        {/* Loading */}
         {isGenerating && (
           <ChatBubble variant="received">
             <ChatBubbleAvatar src="" fallback="🤖" />
@@ -212,26 +217,24 @@ export default function Home() {
         <form
           ref={formRef}
           onSubmit={handleSubmit}
-          className="relative rounded-lg border bg-background focus-within:ring-1 focus-within:ring-ring"
+          className="relative rounded-lg border bg-background focus-within:ring-1 focus-within:ring-ring flex items-center"
         >
           <ChatInput
             value={input}
             onKeyDown={onKeyDown}
             onChange={handleInputChange}
             placeholder="Type your message here..."
-            className="min-h-12 resize-none rounded-lg bg-background border-0 p-3 shadow-none focus-visible:ring-0"
+            className="min-h-12 resize-none rounded-lg bg-background border-0 p-3 shadow-none focus-visible:ring-0 flex-grow"
           />
-          <div className="flex items-center p-3 pt-0">
-            <Button
-              disabled={!input || isLoading}
-              type="submit"
-              size="sm"
-              className="ml-auto gap-1.5 flex align-center"
-            >
-              Send Message
-              <CornerDownLeft className="size-3.5" />
-            </Button>
-          </div>
+          <Button
+            disabled={!input || isLoading}
+            type="submit"
+            size="sm"
+            className="ml-2 gap-1.5 flex align-center"
+          >
+            Send Message
+            <CornerDownLeft className="size-3.5" />
+          </Button>
         </form>
       </div>
     </main>
