@@ -34,11 +34,10 @@ interface Message {
 }
 
 export default function Home() {
-
-    const startingMessage = "How are you doing?";
+  const startingMessage = "How are you doing?";
   const [isGenerating, setIsGenerating] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
-    { role: "assistant", content: "How are you doing?" },
+    { role: "assistant", content: startingMessage },
   ]);
   const [input, setInput] = useState("");
   const [isLoading] = useState(false);
@@ -68,7 +67,11 @@ export default function Home() {
     setIsGenerating(true);
 
     try {
-      const result = await model.generateContent(input);
+      const context = updatedMessages
+        .map((msg) => `${msg.role === "user" ? "User" : "Assistant"}: ${msg.content}`)
+        .join("\n");
+
+      const result = await model.generateContent(context);
       const aiMessage: Message = {
         role: "assistant",
         content: result.response.text(),
