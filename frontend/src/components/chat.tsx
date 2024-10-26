@@ -21,12 +21,17 @@ import remarkGfm from "remark-gfm";
 import CodeDisplayBlock from "@/components/code-display-block";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
+
+
+
 const geminiApiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
 if (!geminiApiKey) {
   throw new Error("NEXT_PUBLIC_GEMINI_API_KEY is not defined");
 }
 const genAI = new GoogleGenerativeAI(geminiApiKey);
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash",
+    systemInstruction: "You are a friendly, supportive virtual therapist. Respond naturally to the user, reacting in a way that feels conversational and empathetic, without sounding overly formal or prescriptive. If the user mentions feelings or emotions, reflect on those in a gentle and friendly way. However, if they are joking or using casual language, respond in kind, maintaining a balance between supportiveness and a sense of humor. Encourage them to explore their thoughts when appropriate but keep it light and adaptive to the context they present.Ask questions to the user for them to open up!"
+ });
 
 const ChatAiIcons = [
   {
@@ -78,16 +83,20 @@ export default function Home() {
     setInput("");
     setIsGenerating(true);
 
+    // const promptText = "You are a compassionate and reflective virtual therapist. Guide the user gently through their thoughts and feelings without asking any direct questions. Encourage them to share more by validating their emotions and offering gentle, open-ended reflections. Focus on empathy and active listening, helping the user explore their experiences in a supportive and non-intrusive way. Emphasize phrases like ‘It sounds like…’ or ‘It seems as if...’ to promote a safe, judgment-free environment where they feel heard and understood. ";
+    const modifiedInput = `${input}`;
+
     try {
-      const result = await model.generateContent(input);
-      const aiMessage: Message = { role: "assistant", content: result.response.text() };
-      setMessages((prevMessages) => [...prevMessages, aiMessage]);
+        const result = await model.generateContent(modifiedInput);
+        const aiMessage: Message = { role: "assistant", content: result.response.text() };
+        setMessages((prevMessages) => [...prevMessages, aiMessage]);
     } catch (error) {
-      console.error("Error generating response:", error);
+        console.error("Error generating response:", error);
     } finally {
-      setIsGenerating(false);
+        setIsGenerating(false);
     }
-  };
+};
+
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
