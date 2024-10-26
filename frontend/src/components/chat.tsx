@@ -12,7 +12,6 @@ import { Button } from "@/components/ui/button";
 import {
   CopyIcon,
   CornerDownLeft,
-  Paperclip,
   RefreshCcw,
   Volume2,
 } from "lucide-react";
@@ -46,7 +45,9 @@ interface Message {
 
 export default function Home() {
   const [isGenerating, setIsGenerating] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<Message[]>([
+    { role: "assistant", content: "How are you doing?" },
+  ]);
   const [input, setInput] = useState("");
   const [isLoading] = useState(false);
 
@@ -73,11 +74,8 @@ export default function Home() {
     setIsGenerating(true);
 
     try {
-    //   const response = await hf.textGeneration({
-    //     model: "zementalist/llama-3-8B-chat-psychotherapist",
-    //     inputs: input,
-    //   });
       const response = await hf.textGeneration({
+        // model: "zementalist/llama-3-8B-chat-psychotherapist",
         model: "gpt2",
         inputs: input,
       });
@@ -106,11 +104,7 @@ export default function Home() {
       setIsGenerating(true);
       try {
         const message = messages[messageIndex];
-        // const response = await hf.textGeneration({
-        //   model: "zementalist/llama-3-8B-chat-psychotherapist",
-        //   inputs: message.content,
-        // });
-         const response = await hf.textGeneration({
+        const response = await hf.textGeneration({
           model: "gpt2",
           inputs: message.content,
         });
@@ -140,7 +134,7 @@ export default function Home() {
     <main className="flex h-screen w-full max-w-3xl flex-col items-center mx-auto py-6">
       <ChatMessageList ref={messagesRef}>
         {/* Initial Message */}
-        {messages.length === 0 && (
+        {messages.length === 1 && (
           <div className="w-full bg-background shadow-sm border rounded-lg p-8 flex flex-col gap-2">
             <h1 className="font-bold">Welcome to PeerTalk.</h1>
             <p className="text-muted-foreground text-sm">
@@ -206,7 +200,7 @@ export default function Home() {
             </ChatBubble>
           ))}
 
-        {/* Loading */}
+        {/* Loading */}https://huggingface.co/datasets/dair-ai/emotion
         {isGenerating && (
           <ChatBubble variant="received">
             <ChatBubbleAvatar src="" fallback="🤖" />
@@ -228,16 +222,11 @@ export default function Home() {
             className="min-h-12 resize-none rounded-lg bg-background border-0 p-3 shadow-none focus-visible:ring-0"
           />
           <div className="flex items-center p-3 pt-0">
-            <Button variant="ghost" size="icon">
-              <Paperclip className="size-4" />
-              <span className="sr-only">Attach file</span>
-            </Button>
-
             <Button
               disabled={!input || isLoading}
               type="submit"
               size="sm"
-              className="ml-auto gap-1.5"
+              className="ml-auto gap-1.5 flex align-center"
             >
               Send Message
               <CornerDownLeft className="size-3.5" />

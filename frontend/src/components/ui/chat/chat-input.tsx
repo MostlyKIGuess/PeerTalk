@@ -18,4 +18,4 @@ const ChatInput = React.forwardRef<HTMLTextAreaElement, React.TextareaHTMLAttrib
 );
 ChatInput.displayName = "ChatInput";
 
-export { ChatInput };
+export { ChatInput  };
