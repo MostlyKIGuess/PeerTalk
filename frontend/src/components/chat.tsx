@@ -81,7 +81,8 @@ export default function Home() {
       setMessages(finalMessages);
       console.log("aiMessage.content", aiMessage.content);
 
-      const previousAIMessage = messages.length > 1 ? messages[messages.length - 1].content : startingMessage;
+      const question = messages.length > 1 ? messages[messages.length - 1].content : startingMessage;
+      const answer = input;
 
       await fetch("http://localhost:8000/api/messages/send", {
         method: "POST",
@@ -89,9 +90,8 @@ export default function Home() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          user_message: input,
-          ai_response: aiMessage.content,
-          previous_ai_message: previousAIMessage,
+          question: question,
+          response: answer,
           timestamp: new Date().toISOString(),
         }),
       });

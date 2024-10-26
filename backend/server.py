@@ -17,9 +17,8 @@ app.add_middleware(
 )
 
 class Message(BaseModel):
-    user_message: str
-    ai_response: str
-    previous_ai_message: str
+    response: str
+    question: str
     timestamp: str
 
 # Initialize a list to store messages
@@ -39,16 +38,15 @@ if os.path.exists("messages.json"):
 async def send_message(msg: Message):
     # Create a timestamp for the message
     timestamp = datetime.now().isoformat()
-
     # Store the incoming user message and the AI's response
-    response_message = msg.ai_response
+    response_message = msg.response
+    question = msg.question
     
     # Create a new message object
     new_message = {
-        "user_message": msg.user_message,
-        "ai_response": response_message,
-        "previous_ai_message": msg.previous_ai_message,
-        "timestamp": timestamp
+       "response": response_message,
+        "question": question,
+        "timestamp": timestamp,
     }
 
     # Append the new message to the list
