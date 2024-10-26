@@ -1,4 +1,5 @@
 import Ripple from "@/components/ui/ripple";
+import Chat from "@/components/chat";
 
 export default function Home() {
   return (
@@ -9,6 +10,7 @@ export default function Home() {
       </p>
       <Ripple />
     </div>
+    <Chat />
 
     </>
   );
