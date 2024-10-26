@@ -16,7 +16,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Define a message model
 class Message(BaseModel):
     user_message: str
     ai_response: str

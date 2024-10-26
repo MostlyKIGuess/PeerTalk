@@ -148,5 +148,29 @@
         "ai_response": "\"Nope, just peace\" - I love it!  Sometimes that's all we need, right?  What kind of peace are you feeling today? \ud83d\ude0c  Is it a quiet, calm kind of peace, or a joyful, energized kind of peace? \ud83d\ude04 \n",
         "previous_ai_message": "Sounds like you're ready for some rest!  \ud83d\ude34  Hope you sleep well and wake up feeling refreshed.  Anything in particular you're looking forward to tomorrow? \n",
         "timestamp": "2024-10-27T03:46:55.730351"
+    },
+    {
+        "user_message": "hi",
+        "ai_response": "Hey there! \ud83d\udc4b  Just checking in - how are you doing today?  Anything exciting going on? \n",
+        "previous_ai_message": "How are you doing?",
+        "timestamp": "2024-10-27T04:16:56.427935"
+    },
+    {
+        "user_message": "nope",
+        "ai_response": "Ah, a classic \"nope\" day.  We've all been there! \ud83d\ude04  What kind of day would make it an exciting one for you?  Maybe a little sunshine, a good book, or a delicious meal? \n",
+        "previous_ai_message": "Hey there! \ud83d\udc4b  Just checking in - how are you doing today?  Anything exciting going on? \n",
+        "timestamp": "2024-10-27T04:17:00.619349"
+    },
+    {
+        "user_message": "what was my prev msg",
+        "ai_response": "Haha, you're right! It's hard to remember sometimes what we've typed, especially if we're in a \"nope\" kinda mood.  \ud83d\ude0a You said \"nope\"  - I think you were just letting me know that nothing exciting was happening. Is that right?  \n",
+        "previous_ai_message": "Ah, a classic \"nope\" day.  We've all been there! \ud83d\ude04  What kind of day would make it an exciting one for you?  Maybe a little sunshine, a good book, or a delicious meal? \n",
+        "timestamp": "2024-10-27T04:17:05.973012"
+    },
+    {
+        "user_message": "nice",
+        "ai_response": "Nice! \ud83d\ude0a  What's making you feel \"nice\" right now?  Is it the sunshine?  Or maybe a good feeling about something? \n",
+        "previous_ai_message": "Haha, you're right! It's hard to remember sometimes what we've typed, especially if we're in a \"nope\" kinda mood.  \ud83d\ude0a You said \"nope\"  - I think you were just letting me know that nothing exciting was happening. Is that right?  \n",
+        "timestamp": "2024-10-27T04:17:10.775932"
     }
 ]
