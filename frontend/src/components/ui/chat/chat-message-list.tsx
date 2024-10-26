@@ -1,9 +1,7 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 
-interface ChatMessageListProps extends React.HTMLAttributes<HTMLDivElement> {}
-
-const ChatMessageList = React.forwardRef<HTMLDivElement, ChatMessageListProps>(
+const ChatMessageList = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, children, ...props }, ref) => (
     <div
       className={cn(

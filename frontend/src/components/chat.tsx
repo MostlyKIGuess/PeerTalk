@@ -48,7 +48,7 @@ export default function Home() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading] = useState(false);
 
   const messagesRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
