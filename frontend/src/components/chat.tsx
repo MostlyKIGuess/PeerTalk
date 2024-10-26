@@ -2,7 +2,6 @@
 
 import {
   ChatBubble,
-  ChatBubbleAction,
   ChatBubbleAvatar,
   ChatBubbleMessage,
 } from "@/components/ui/chat/chat-bubble";
@@ -10,10 +9,7 @@ import { ChatInput } from "@/components/ui/chat/chat-input";
 import { ChatMessageList } from "@/components/ui/chat/chat-message-list";
 import { Button } from "@/components/ui/button";
 import {
-  CopyIcon,
   CornerDownLeft,
-  RefreshCcw,
-  Volume2,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import Markdown from "react-markdown";
@@ -21,32 +17,16 @@ import remarkGfm from "remark-gfm";
 import CodeDisplayBlock from "@/components/code-display-block";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-
-
-
 const geminiApiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
 if (!geminiApiKey) {
   throw new Error("NEXT_PUBLIC_GEMINI_API_KEY is not defined");
 }
 const genAI = new GoogleGenerativeAI(geminiApiKey);
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash",
-    systemInstruction: "You are a friendly, supportive virtual therapist. Respond naturally to the user, reacting in a way that feels conversational and empathetic, without sounding overly formal or prescriptive. If the user mentions feelings or emotions, reflect on those in a gentle and friendly way. However, if they are joking or using casual language, respond in kind, maintaining a balance between supportiveness and a sense of humor. Encourage them to explore their thoughts when appropriate but keep it light and adaptive to the context they present.Ask questions to the user for them to open up!"
- });
-
-const ChatAiIcons = [
-  {
-    icon: CopyIcon,
-    label: "Copy",
-  },
-  {
-    icon: RefreshCcw,
-    label: "Refresh",
-  },
-  {
-    icon: Volume2,
-    label: "Volume",
-  },
-];
+const model = genAI.getGenerativeModel({
+  model: "gemini-1.5-flash",
+  systemInstruction:
+    "You are a friendly, supportive virtual therapist. Respond naturally to the user, reacting in a way that feels conversational and empathetic, without sounding overly formal or prescriptive. If the user mentions feelings or emotions, reflect on those in a gentle and friendly way. However, if they are joking or using casual language, respond in kind, maintaining a balance between supportiveness and a sense of humor. Encourage them to explore their thoughts when appropriate but keep it light and adaptive to the context they present. Ask questions to the user for them to open up!",
+});
 
 interface Message {
   role: "user" | "assistant";
@@ -54,6 +34,8 @@ interface Message {
 }
 
 export default function Home() {
+
+    const startingMessage = "How are you doing?";
   const [isGenerating, setIsGenerating] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     { role: "assistant", content: "How are you doing?" },
@@ -79,24 +61,43 @@ export default function Home() {
     if (!input.trim()) return;
 
     const userMessage: Message = { role: "user", content: input };
-    setMessages([...messages, userMessage]);
+
+    const updatedMessages = [...messages, userMessage];
+    setMessages(updatedMessages);
     setInput("");
     setIsGenerating(true);
 
-    // const promptText = "You are a compassionate and reflective virtual therapist. Guide the user gently through their thoughts and feelings without asking any direct questions. Encourage them to share more by validating their emotions and offering gentle, open-ended reflections. Focus on empathy and active listening, helping the user explore their experiences in a supportive and non-intrusive way. Emphasize phrases like ‘It sounds like…’ or ‘It seems as if...’ to promote a safe, judgment-free environment where they feel heard and understood. ";
-    const modifiedInput = `${input}`;
-
     try {
-        const result = await model.generateContent(modifiedInput);
-        const aiMessage: Message = { role: "assistant", content: result.response.text() };
-        setMessages((prevMessages) => [...prevMessages, aiMessage]);
-    } catch (error) {
-        console.error("Error generating response:", error);
-    } finally {
-        setIsGenerating(false);
-    }
-};
+      const result = await model.generateContent(input);
+      const aiMessage: Message = {
+        role: "assistant",
+        content: result.response.text(),
+      };
 
+      const finalMessages = [...updatedMessages, aiMessage];
+      setMessages(finalMessages);
+      console.log("aiMessage.content", aiMessage.content);
+
+      const previousAIMessage = messages.length > 1 ? messages[messages.length - 1].content : startingMessage;
+
+      await fetch("http://localhost:8000/api/messages/send", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          user_message: input,
+          ai_response: aiMessage.content,
+          previous_ai_message: previousAIMessage,
+          timestamp: new Date().toISOString(),
+        }),
+      });
+    } catch (error) {
+      console.error("Error generating response:", error);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -104,34 +105,6 @@ export default function Home() {
       if (isGenerating || isLoading || !input) return;
       setIsGenerating(true);
       handleSubmit(e as unknown as React.FormEvent<HTMLFormElement>);
-    }
-  };
-
-  const handleActionClick = async (action: string, messageIndex: number) => {
-    console.log("Action clicked:", action, "Message index:", messageIndex);
-    if (action === "Refresh") {
-      setIsGenerating(true);
-      try {
-        const message = messages[messageIndex];
-        const result = await model.generateContent(message.content);
-        const aiMessage: Message = { role: "assistant", content: result.response.text() };
-        setMessages((prevMessages) => {
-          const newMessages = [...prevMessages];
-          newMessages[messageIndex] = aiMessage;
-          return newMessages;
-        });
-      } catch (error) {
-        console.error("Error reloading:", error);
-      } finally {
-        setIsGenerating(false);
-      }
-    }
-
-    if (action === "Copy") {
-      const message = messages[messageIndex];
-      if (message && message.role === "assistant") {
-        navigator.clipboard.writeText(message.content);
-      }
     }
   };
 
@@ -183,20 +156,7 @@ export default function Home() {
                     <div className="flex items-center mt-1.5 gap-1">
                       {!isGenerating && (
                         <>
-                          {ChatAiIcons.map((icon, iconIndex) => {
-                            const Icon = icon.icon;
-                            return (
-                              <ChatBubbleAction
-                                variant="outline"
-                                className="size-5"
-                                key={iconIndex}
-                                icon={<Icon className="size-3" />}
-                                onClick={() =>
-                                  handleActionClick(icon.label, index)
-                                }
-                              />
-                            );
-                          })}
+                       
                         </>
                       )}
                     </div>
@@ -230,7 +190,7 @@ export default function Home() {
             disabled={!input || isLoading}
             type="submit"
             size="sm"
-            className="ml-2 gap-1.5 flex align-center"
+            className="ml-2 gap-1.5 flex align-center mr-2"
           >
             Send Message
             <CornerDownLeft className="size-3.5" />
