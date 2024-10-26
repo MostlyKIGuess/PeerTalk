@@ -1,7 +1,9 @@
-from pydanmaku import BaseModel
+from pydantic import BaseModel
+
 
 class Message(BaseModel):
-    text: str
+    question: str
+    response: str
     polarity: int
     keywords: list = []
     concerns: dict[str, float] = {}
