@@ -79,23 +79,44 @@ export default function Home() {
     if (!input.trim()) return;
 
     const userMessage: Message = { role: "user", content: input };
-    setMessages([...messages, userMessage]);
+    
+    const updatedMessages = [...messages, userMessage];
+    setMessages(updatedMessages);
+    localStorage.setItem("messages", JSON.stringify(updatedMessages)); 
     setInput("");
     setIsGenerating(true);
 
-    // const promptText = "You are a compassionate and reflective virtual therapist. Guide the user gently through their thoughts and feelings without asking any direct questions. Encourage them to share more by validating their emotions and offering gentle, open-ended reflections. Focus on empathy and active listening, helping the user explore their experiences in a supportive and non-intrusive way. Emphasize phrases like ‘It sounds like…’ or ‘It seems as if...’ to promote a safe, judgment-free environment where they feel heard and understood. ";
-    const modifiedInput = `${input}`;
-
     try {
-        const result = await model.generateContent(modifiedInput);
-        const aiMessage: Message = { role: "assistant", content: result.response.text() };
-        setMessages((prevMessages) => [...prevMessages, aiMessage]);
+        const result = await model.generateContent(input);
+        const aiMessage: Message = {
+            role: "assistant",
+            content: result.response.text(),
+        };
+
+        const finalMessages = [...updatedMessages, aiMessage];
+        setMessages(finalMessages);
+        localStorage.setItem("messages", JSON.stringify(finalMessages)); 
+        console.log("aiMessage.content", aiMessage.content);
+
+        await fetch("http://localhost:8000/api/messages/send", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          
+          body: JSON.stringify({
+            user_message: input,
+            ai_response: aiMessage.content,
+            timestamp: new Date().toISOString(),
+          }),
+        });
     } catch (error) {
         console.error("Error generating response:", error);
     } finally {
         setIsGenerating(false);
     }
-};
+  };
+
 
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -183,7 +204,7 @@ export default function Home() {
                     <div className="flex items-center mt-1.5 gap-1">
                       {!isGenerating && (
                         <>
-                          {ChatAiIcons.map((icon, iconIndex) => {
+                          {/* {ChatAiIcons.map((icon, iconIndex) => {
                             const Icon = icon.icon;
                             return (
                               <ChatBubbleAction
@@ -196,7 +217,7 @@ export default function Home() {
                                 }
                               />
                             );
-                          })}
+                          })} */}
                         </>
                       )}
                     </div>
@@ -230,8 +251,8 @@ export default function Home() {
             disabled={!input || isLoading}
             type="submit"
             size="sm"
-            className="ml-2 gap-1.5 flex align-center"
-          >
+            className="ml-2 gap-1.5 flex align-center mr-2"
+           >
             Send Message
             <CornerDownLeft className="size-3.5" />
           </Button>
