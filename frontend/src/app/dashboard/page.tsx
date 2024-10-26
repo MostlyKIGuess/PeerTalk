@@ -5,7 +5,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -35,7 +34,8 @@ ChartJS.register(
 );
 
 type Message = {
-  text: string;
+  question: string;
+  response: string;
   metrics: {
     polarity: string;
     keywords: string;
@@ -46,11 +46,13 @@ type Message = {
 
 type Session = {
   start_time: string;
-  initial_persona: string;
   messages: Message[];
   recommendation: string;
+  final_persona: string;
   metrics: {
-    overall_concern_intensity: { [name: string]: number };
+    polarity: string;
+    keywords: string;
+    concerns: { [name: string]: number };
   };
 };
 
@@ -70,12 +72,10 @@ const Page = () => {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [combinedAnalysis, setCombinedAnalysis] = useState<{
     timeline: {
-      date: string;
       polarity: string;
       concerns: { name: string; intensity: number }[];
     }[];
   }>({ timeline: [] });
-  const [selectedSession, setSelectedSession] = useState(0);
 
   useEffect(() => {
     const fetchSessions = async () => {
@@ -88,10 +88,6 @@ const Page = () => {
         concerns: Object.entries(session.metrics.concerns)
           .filter(([, intensity]) => intensity > 0)
           .map(([name, intensity]) => ({ name, intensity })),
-      }));
-
-      const polarityData = data.flatMap((session) => ({
-        polarity: session.metrics.polarity,
       }));
 
       setCombinedAnalysis({ timeline: timelineData });
@@ -145,12 +141,7 @@ const Page = () => {
     <div className="flex h-screen">
       {/* Left Side - Session View Tabs */}
       <div className="w-1/2 p-8 border-r overflow-y-scroll no-scrollbar scrollbar-none">
-        <Tabs
-          defaultValue={`session-0`}
-          onValueChange={(value) =>
-            setSelectedSession(Number(value.split("-")[1]))
-          }
-        >
+        <Tabs defaultValue={`session-0`}>
           <TabsList>
             {sessions.map((_, index) => (
               <TabsTrigger key={index} value={`session-${index}`}>
@@ -163,7 +154,6 @@ const Page = () => {
               <Card className="m-4">
                 <CardHeader>
                   <CardTitle>Session Details</CardTitle>
-                  <CardDescription>{session.initial_persona}</CardDescription>
                   <p className="text-sm text-gray-500">
                     {new Date(session.start_time).toLocaleString()}
                   </p>
@@ -172,17 +162,21 @@ const Page = () => {
                   {session.messages.map((msg, idx) => (
                     <div key={idx} className="my-4 border-b pb-4">
                       <h3 className="text-lg font-bold">Message {idx + 1}</h3>
-                      <p className="text-sm my-2"><strong>Question:</strong> {msg.question} </p>
+                      <p className="text-sm my-2">
+                        <strong>Question:</strong> {msg.question}{" "}
+                      </p>
                       <p className="text-sm my-2">
                         <strong>Response:</strong> {msg.response}
                       </p>
                       <p className="text-sm my-2">
-                      <strong>Polarity:</strong> {msg.metrics.polarity}
+                        <strong>Polarity:</strong> {msg.metrics.polarity}
                       </p>
                       <p className="text-sm my-2">
-                      <strong>Key Phrase:</strong> {msg.metrics.keywords}
+                        <strong>Key Phrase:</strong> {msg.metrics.keywords}
                       </p>
-                      <p className="text-sm my-2"><strong>Concerns:</strong></p>
+                      <p className="text-sm my-2">
+                        <strong>Concerns:</strong>
+                      </p>
                       <ul>
                         {Object.entries(msg.metrics.concerns)
                           .filter(([, intensity]) => intensity > 0)
@@ -210,38 +204,37 @@ const Page = () => {
                   ))}
                   {/* Overall metrics */}
                   <div className="my-4 border-b pb-4">
-                      <h3 className="text-lg font-bold">Overall Metrics</h3>
-                      <p className="text-sm my-2">
+                    <h3 className="text-lg font-bold">Overall Metrics</h3>
+                    <p className="text-sm my-2">
                       <strong>Polarity:</strong> {session.metrics.polarity}
-                      </p>
-                      <p className="text-sm my-2">
+                    </p>
+                    <p className="text-sm my-2">
                       <strong>Key Phrase:</strong> {session.metrics.keywords}
-                      </p>
-                      <p className="text-sm my-2"><strong>Concerns:</strong></p>
-                      <ul>
-                        {Object.entries(session.metrics.concerns)
-                          .filter(([, intensity]) => intensity > 0)
-                          .map(([concern, intensity], j) => (
-                            <li
-                              key={j}
-                              className="flex items-center gap-2 my-1"
+                    </p>
+                    <p className="text-sm my-2">
+                      <strong>Concerns:</strong>
+                    </p>
+                    <ul>
+                      {Object.entries(session.metrics.concerns)
+                        .filter(([, intensity]) => intensity > 0)
+                        .map(([concern, intensity], j) => (
+                          <li key={j} className="flex items-center gap-2 my-1">
+                            <span
+                              className="w-24"
+                              style={{ color: concernColors[concern] }}
                             >
-                              <span
-                                className="w-24"
-                                style={{ color: concernColors[concern] }}
-                              >
-                                {concern}
-                              </span>
-                              <Progress
-                                value={(intensity / 10) * 100}
-                                max={100}
-                                color={concernColors[concern]}
-                              />
-                              <span>{intensity}/10</span>
-                            </li>
-                          ))}
-                      </ul>
-                    </div>
+                              {concern}
+                            </span>
+                            <Progress
+                              value={(intensity / 10) * 100}
+                              max={100}
+                              color={concernColors[concern]}
+                            />
+                            <span>{intensity}/10</span>
+                          </li>
+                        ))}
+                    </ul>
+                  </div>
                 </CardContent>
                 <CardFooter className="flex flex-col text-left justify-normal">
                   <h3 className="text-lg font-semibold text-left">
