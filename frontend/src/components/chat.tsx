@@ -19,9 +19,14 @@ import { useEffect, useRef, useState } from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import CodeDisplayBlock from "@/components/code-display-block";
-import { HfInference } from "@huggingface/inference";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const hf = new HfInference(process.env.NEXT_PUBLIC_HF_API_KEY);
+const geminiApiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+if (!geminiApiKey) {
+  throw new Error("NEXT_PUBLIC_GEMINI_API_KEY is not defined");
+}
+const genAI = new GoogleGenerativeAI(geminiApiKey);
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 const ChatAiIcons = [
   {
@@ -74,13 +79,8 @@ export default function Home() {
     setIsGenerating(true);
 
     try {
-      const response = await hf.textGeneration({
-        // model: "zementalist/llama-3-8B-chat-psychotherapist",
-        model: "gpt2",
-        inputs: input,
-      });
-
-      const aiMessage: Message = { role: "assistant", content: response.generated_text };
+      const result = await model.generateContent(input);
+      const aiMessage: Message = { role: "assistant", content: result.response.text() };
       setMessages((prevMessages) => [...prevMessages, aiMessage]);
     } catch (error) {
       console.error("Error generating response:", error);
@@ -104,12 +104,8 @@ export default function Home() {
       setIsGenerating(true);
       try {
         const message = messages[messageIndex];
-        const response = await hf.textGeneration({
-          model: "gpt2",
-          inputs: message.content,
-        });
-
-        const aiMessage: Message = { role: "assistant", content: response.generated_text };
+        const result = await model.generateContent(message.content);
+        const aiMessage: Message = { role: "assistant", content: result.response.text() };
         setMessages((prevMessages) => {
           const newMessages = [...prevMessages];
           newMessages[messageIndex] = aiMessage;
@@ -212,26 +208,24 @@ export default function Home() {
         <form
           ref={formRef}
           onSubmit={handleSubmit}
-          className="relative rounded-lg border bg-background focus-within:ring-1 focus-within:ring-ring"
+          className="relative rounded-lg border bg-background focus-within:ring-1 focus-within:ring-ring flex items-center"
         >
           <ChatInput
             value={input}
             onKeyDown={onKeyDown}
             onChange={handleInputChange}
             placeholder="Type your message here..."
-            className="min-h-12 resize-none rounded-lg bg-background border-0 p-3 shadow-none focus-visible:ring-0"
+            className="min-h-12 resize-none rounded-lg bg-background border-0 p-3 shadow-none focus-visible:ring-0 flex-grow"
           />
-          <div className="flex items-center p-3 pt-0">
-            <Button
-              disabled={!input || isLoading}
-              type="submit"
-              size="sm"
-              className="ml-auto gap-1.5 flex align-center"
-            >
-              Send Message
-              <CornerDownLeft className="size-3.5" />
-            </Button>
-          </div>
+          <Button
+            disabled={!input || isLoading}
+            type="submit"
+            size="sm"
+            className="ml-2 gap-1.5 flex align-center"
+          >
+            Send Message
+            <CornerDownLeft className="size-3.5" />
+          </Button>
         </form>
       </div>
     </main>
