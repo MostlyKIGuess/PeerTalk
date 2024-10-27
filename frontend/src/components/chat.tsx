@@ -156,9 +156,9 @@ export default function Home() {
       const answer = input;
 
       console.log(keystrokes, backspaces, typingSpeed);
-     
+
       setIsGenerating(false);
-      
+
       await fetch("http://localhost:8000/api/messages/send", {
         method: "POST",
         headers: {
@@ -167,11 +167,11 @@ export default function Home() {
         body: JSON.stringify({
           question: question,
           response: answer,
-          typing_metrics: {
-            keystrokes,
-            backspaces,
-            typing_speed: typingSpeed,
-          },
+          typing_metrics: JSON.stringify({
+            keystrokes: keystrokes,
+            backspaces: backspaces,
+            typingSpeed: typingSpeed,
+          }),
           timestamp: new Date().toISOString(),
         }),
       });
