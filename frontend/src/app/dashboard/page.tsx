@@ -92,9 +92,11 @@ const Page = () => {
 
       const timelineData = data.flatMap((session) => ({
         polarity: session.metrics.polarity,
-        concerns: Object.entries(session.metrics.concerns)
-          .filter(([, intensity]) => intensity > 0)
-          .map(([name, intensity]) => ({ name, intensity })),
+        concerns: session.metrics.concerns
+          ? Object.entries(session.metrics.concerns)
+              .filter(([, intensity]) => intensity > 0)
+              .map(([name, intensity]) => ({ name, intensity }))
+          : [],
       }));
 
       setCombinedAnalysis({ timeline: timelineData });
@@ -180,8 +182,7 @@ const Page = () => {
                 </CardHeader>
                 <CardContent>
                   {session.messages.map((msg, idx) => (
-                    // {{console.log(msg)}}
-                      <div key={idx} className="my-4 border-b pb-4">
+                    <div key={idx} className="my-4 border-b pb-4">
                       <h3 className="text-lg font-bold">Message {idx + 1}</h3>
                       <p className="text-sm my-2">
                         <strong>Question:</strong> {msg.question}{" "}
@@ -189,15 +190,15 @@ const Page = () => {
                       <p className="text-sm my-2">
                         <strong>Response:</strong> {msg.response}
                       </p>
-                      <p>{index==0}</p>
-                      {(index != 0) && (
-                          <div>
+                      <p>{index == 0}</p>
+                      {index != 0 && (
+                        <div>
                           <p className="text-sm my-2">
                             <strong>Polarity:</strong> {msg.metrics.polarity}
                           </p>
                           <p className="text-sm my-2">
-                            <strong>Key Phrase:</strong> {msg.metrics.keywords.join(", ")
-                            }
+                            <strong>Key Phrase:</strong>{" "}
+                            {msg.metrics.keywords.join(", ")}
                           </p>
                           <p className="text-sm my-2">
                             <strong>Concerns:</strong>
@@ -236,30 +237,80 @@ const Page = () => {
                       <strong>Polarity:</strong> {session.metrics.polarity}
                     </p>
                     <p className="text-sm my-2">
-                      <strong>Key Phrase:</strong> {session.metrics.keywords.join(", ")}
+                      <strong>Key Phrase:</strong>{" "}
+                      {session.metrics?.keywords?.join(", ") ||
+                        "No keywords available"}
                     </p>
                     <p className="text-sm my-2">
                       <strong>Concerns:</strong>
                     </p>
                     <ul>
-                      {Object.entries(session.metrics.concerns)
-                        .filter(([, intensity]) => intensity > 0)
-                        .map(([concern, intensity], j) => (
-                          <li key={j} className="flex items-center gap-2 my-1">
-                            <span
-                              className="w-24"
-                              style={{ color: concernColors[concern] }}
+                      {session.metrics?.concerns
+                        ? Object.entries(session.metrics.concerns)
+                            .filter(([, intensity]) => intensity > 0)
+                            .map(([concern, intensity], j) => (
+                              <li
+                                key={j}
+                                className="flex items-center gap-2 my-1"
+                              >
+                                <span
+                                  className="w-24"
+                                  style={{ color: concernColors[concern] }}
+                                >
+                                  {concern}
+                                </span>
+                                <Progress
+                                  value={(intensity / 10) * 100}
+                                  max={100}
+                                  color={concernColors[concern]}
+                                />
+                                <span>{intensity}/10</span>
+                              </li>
+                            ))
+                            .concat(
+                              Array.from(
+                                {
+                                  length:
+                                    9 -
+                                    Object.entries(session.metrics.concerns)
+                                      .length,
+                                },
+                                (_, j) => (
+                                  <li
+                                    key={`placeholder-${j}`}
+                                    className="flex items-center gap-2 my-1"
+                                  >
+                                    <span
+                                      className="w-24"
+                                      style={{ color: "#ccc" }}
+                                    >
+                                      Placeholder
+                                    </span>
+                                    <Progress
+                                      value={0}
+                                      max={100}
+                                      color="#ccc"
+                                    />
+                                    <span>0/10</span>
+                                  </li>
+                                )
+                              )
+                            )
+                        : Array.from({ length: 9 }, (_, j) => (
+                            <li
+                              key={`placeholder-${j}`}
+                              className="flex items-center gap-2 my-1"
                             >
-                              {concern}
-                            </span>
-                            <Progress
-                              value={(intensity / 10) * 100}
-                              max={100}
-                              color={concernColors[concern]}
-                            />
-                            <span>{intensity}/10</span>
-                          </li>
-                        ))}
+                              <span
+                                className="w-24"
+                                style={{ color: "#ccc" }}
+                              >
+                                Placeholder
+                              </span>
+                              <Progress value={0} max={100} color="#ccc" />
+                              <span>0/10</span>
+                            </li>
+                          ))}
                     </ul>
                     <p className="text-sm my-2">
                       <strong>Keystrokes:</strong> {session.metrics.keystrokes}
