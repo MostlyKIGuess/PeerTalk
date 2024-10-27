@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { useState, useEffect } from "react";
+import { useState, useEffect, ReactNode } from "react";
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -53,6 +53,9 @@ type Session = {
   recommendation: string;
   final_persona: string;
   metrics: {
+    speed: ReactNode;
+    backspaces: ReactNode;
+    keystrokes: ReactNode;
     polarity: string;
     keywords: string[];
     concerns: { [name: string]: number };
