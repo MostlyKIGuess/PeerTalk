@@ -54,7 +54,7 @@ export default function Home() {
 
   // api call to /api/startsession
   useEffect(() => {
-    fetch("http://localhost:8000/api/startsession", {
+    fetch("http://localhost:8000/api/session/start", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -132,7 +132,7 @@ export default function Home() {
 
     try {
       const context = updatedMessages
-      .slice(-8)
+        .slice(-8)
         .map(
           (msg) =>
             `${msg.role === "user" ? "User" : "Assistant"}: ${msg.content}`
@@ -281,6 +281,18 @@ export default function Home() {
           >
             Send Message
             <CornerDownLeft className="size-3.5" />
+          </Button>{" "}
+          <Button
+            size="sm"
+            type="button"
+            onClick={async () => {
+              await fetch("http://localhost:8000/api/session/end", {
+                method: "GET",
+              });
+            }}
+            className="ml-2 gap-1.5 flex align-center mr-2"
+          >
+            End
           </Button>
         </form>
       </div>
