@@ -9,12 +9,11 @@ import { ChatInput } from "@/components/ui/chat/chat-input";
 import { ChatMessageList } from "@/components/ui/chat/chat-message-list";
 import { Button } from "@/components/ui/button";
 import { CornerDownLeft } from "lucide-react";
-import { use, useEffect, useRef, useState } from "react";
+import {  useEffect, useRef, useState } from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import CodeDisplayBlock from "@/components/code-display-block";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { get } from "http";
 
 const geminiApiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
 if (!geminiApiKey) {
