@@ -221,7 +221,7 @@ export default function Home() {
   };
 
   return (
-    <main className="flex h-screen w-full max-w-3xl flex-col items-center mx-auto py-6">
+    <main className="flex h-screen w-full max-w-3xl flex-col items-center mx-auto py-6 no-scrollbar scrollbar-none">
       <ChatMessageList ref={messagesRef}>
         {/* Initial Message */}
         {messages.length === 1 && (
