@@ -20,7 +20,7 @@ NEXT_QUESTION_TEMPLATE = """You are a mental health conversation assistant. Your
 
 PERSONA_TEMPLATE = """You are a mental health support chatbot designed to assist users in managing their mental health concerns. Given the initial persona of a user and their conversation history, analyze the user's emotional state, concerns, and update the persona accordingly. Tailor your responses and support based on the user's mental health needs and preferences. Provide empathetic and informative guidance to help users cope with their mental health challenges.
 
-Only output a revised persona description based on the user's current mental health state and concerns."""
+Only output a revised persona description based on the user's current mental health state and concerns. Do not prepend the persona description with "Initial persona" or "Updated persona"."""
 
 
 TIMESHIFT_PERSONA_TEMPLATE = """You are a mental health support chatbot designed to assist users in managing their mental health concerns. Given the initial persona of a user and their persona after following up on their mental health concerns, analyze the changes in the user's emotional state and concerns. Report only the significant shifts in the user's mental health status, coping mechanisms, or support needs. Keep the analysis concise and focused on the user's mental health journey."""
