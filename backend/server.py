@@ -101,15 +101,18 @@ async def start_session():
             "recommendation": user[-1]["recommendation"],
             "final_persona": user[-1]["final_persona"],
         }
-        user.append(
-            {
-                "start_time": datetime.now().isoformat(),
-                "messages": [],
-                "recommendation": "",
-                "final_persona": "",
-                "metrics": {},
-            }
-        )
+        if len(user) > 1 and user[-1]["final_persona"] == "":
+            user[-1]["start_time"] = datetime.now().isoformat()
+        else:
+            user.append(
+                {
+                    "start_time": datetime.now().isoformat(),
+                    "messages": [],
+                    "recommendation": "",
+                    "final_persona": "",
+                    "metrics": {},
+                }
+            )
     else:
         ret_val = {"oldUser": False}
         user = [
@@ -134,7 +137,8 @@ concerns = ['Stress', 'Depression', 'Bipolar disorder',
 def evaluate_response(user_response, question=None):
     messages = [{"role": "system", "content": POLARITY_TEMPLATE}]
     if question:
-        messages.append({"role": "user", "content": f"Question: {question}\nUser response: {user_response}"})
+        messages.append({"role": "user", "content": f"Question: {
+                        question}\nUser response: {user_response}"})
     else:
         messages.append({"role": "user", "content": user_response})
 
@@ -217,6 +221,7 @@ def get_recommendation(user):
     recommendation = recommendation_response.choices[0].message.content
     return recommendation
 
+
 @app.get("/api/session/end")
 async def end_session():
     print("Ending session")
@@ -224,7 +229,8 @@ async def end_session():
     if user:
         conv_hist = ""
         for message in user[-1]["messages"]:
-            conv_hist += f"Assistant: {message['question']}\nUser: {message['response']}\n"
+            conv_hist += f"Assistant: {message['question']
+                                       }\nUser: {message['response']}\n"
 
         print(conv_hist)
 
