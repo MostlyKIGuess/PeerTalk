@@ -99,6 +99,7 @@ export default function Home() {
 
     try {
       const context = updatedMessages
+      .slice(-8)
         .map(
           (msg) =>
             `${msg.role === "user" ? "User" : "Assistant"}: ${msg.content}`

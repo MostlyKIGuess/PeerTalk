@@ -6,8 +6,8 @@
         "question": "I'm feeling very stressed and overwhelmed with work.",
         "response": "It sounds challenging. Have you tried setting smaller, achievable goals to reduce stress?",
         "metrics": {
-          "polarity": "Negative",
-          "keywords": "stress work overwhelmed",
+          "polarity": "negative",
+          "keywords": "stress, work, overwhelmed",
           "concerns": {
             "Anxiety": 5,
             "Career Confusion": 3,
@@ -24,8 +24,8 @@
         "question": "I'm worried about my future career path.",
         "response": "Career uncertainty is very common. Exploring new skills or networking can provide some clarity.",
         "metrics": {
-          "polarity": "Positive",
-          "keywords": "career future uncertainty",
+          "polarity": "neutral",
+          "keywords": "career, future, uncertainty",
           "concerns": {
             "Anxiety": 3,
             "Career Confusion": 4,
@@ -39,125 +39,11 @@
         }
       }
     ],
-    "recommendation": "Consider mindfulness exercises to help manage stress and build resilience.Sunt enim eu proident laborum tempor nulla deserunt in ea ipsum Lorem ex. Sint minim excepteur ex est dolore Lorem culpa tempor ullamco occaecat id ea in ipsum. Eu pariatur esse laboris amet irure veniam est ullamco Lorem fugiat exercitation.",
+    "recommendation": "Consider mindfulness exercises to help manage stress and build resilience.",
     "final_persona": "Motivated Learner",
     "metrics": {
-      "polarity": "Neutral",
-      "keywords": "stress work career uncertainty",
-      "concerns": {
-        "Anxiety": 4,
-        "Career Confusion": 4,
-        "Depression": 0.5, 
-        "Eating Disorder": 0,
-        "Health Anxiety": 0,
-        "Insomnia": 1,
-        "Positive Outlook": 1.5,
-        "Stress": 3
-      }
-    }
-  },
-  {
-    "start_time": "2024-10-27T09:30:00",
-    "messages": [
-      {
-        "question": "I've been having trouble sleeping lately.",
-        "response": "Sleep issues can be tough. Have you tried limiting screen time before bed?",
-        "metrics": {
-          "polarity": "Negative",
-          "keywords": "sleep trouble screen time",
-          "concerns": {
-            "Anxiety": 2,
-            "Career Confusion": 0,
-            "Depression": 0,
-            "Eating Disorder": 0,
-            "Health Anxiety": 0,
-            "Insomnia": 5,
-            "Positive Outlook": 1,
-            "Stress": 1
-          }
-        }
-      },
-      {
-        "question": "I think I may have some health anxiety issues as well.",
-        "response": "Health anxiety can be challenging. Practicing grounding techniques might help.",
-        "metrics": {
-          "polarity": "Negative",
-          "keywords": "health anxiety issues",
-          "concerns": {
-            "Anxiety": 4,
-            "Career Confusion": 0,
-            "Depression": 0,
-            "Eating Disorder": 0,
-            "Health Anxiety": 3,
-            "Insomnia": 2,
-            "Positive Outlook": 1,
-            "Stress": 2
-          }
-        }
-      }
-    ],
-    "recommendation": "Practice relaxation techniques and set a consistent sleep routine.",
-    "final_persona": "Relaxed Explorer",
-    "metrics": {
-      "polarity": "Positive",
-      "keywords": "sleep health anxiety routine",
-      "concerns": {
-        "Anxiety": 3,
-        "Career Confusion": 0,
-        "Depression": 0,
-        "Eating Disorder": 0,
-        "Health Anxiety": 1.5,
-        "Insomnia": 3.5,
-        "Positive Outlook": 1,
-        "Stress": 1.5
-      }
-    }
-  },
-  {
-    "start_time": "2024-10-27T08:00:00",
-    "messages": [
-      {
-        "question": "I'm feeling very stressed and overwhelmed with work.",
-        "response": "It sounds challenging. Have you tried setting smaller, achievable goals to reduce stress?",
-        "metrics": {
-          "polarity": "Negative",
-          "keywords": "stress work overwhelmed",
-          "concerns": {
-            "Anxiety": 5,
-            "Career Confusion": 3,
-            "Depression": 1,
-            "Eating Disorder": 0,
-            "Health Anxiety": 0,
-            "Insomnia": 2,
-            "Positive Outlook": 1,
-            "Stress": 4
-          }
-        }
-      },
-      {
-        "question": "I'm worried about my future career path.",
-        "response": "Career uncertainty is very common. Exploring new skills or networking can provide some clarity.",
-        "metrics": {
-          "polarity": "Neutral",
-          "keywords": "career future uncertainty",
-          "concerns": {
-            "Anxiety": 3,
-            "Career Confusion": 4,
-            "Depression": 0,
-            "Eating Disorder": 0,
-            "Health Anxiety": 0,
-            "Insomnia": 0,
-            "Positive Outlook": 2,
-            "Stress": 2
-          }
-        }
-      }
-    ],
-    "recommendation": "Consider mindfulness exercises to help manage stress and build resilience.Sunt enim eu proident laborum tempor nulla deserunt in ea ipsum Lorem ex. Sint minim excepteur ex est dolore Lorem culpa tempor ullamco occaecat id ea in ipsum. Eu pariatur esse laboris amet irure veniam est ullamco Lorem fugiat exercitation.",
-    "final_persona": "Motivated Learner",
-    "metrics": {
-      "polarity": "Neutral",
-      "keywords": "stress work career uncertainty",
+      "polarity": "neutral",
+      "average_keywords": "stress, work, career, uncertainty",
       "concerns": {
         "Anxiety": 4,
         "Career Confusion": 4,
@@ -177,8 +63,8 @@
         "question": "I've been having trouble sleeping lately.",
         "response": "Sleep issues can be tough. Have you tried limiting screen time before bed?",
         "metrics": {
-          "polarity": "Negative",
-          "keywords": "sleep trouble screen time",
+          "polarity": "negative",
+          "keywords": "sleep, trouble, screen time",
           "concerns": {
             "Anxiety": 2,
             "Career Confusion": 0,
@@ -195,8 +81,8 @@
         "question": "I think I may have some health anxiety issues as well.",
         "response": "Health anxiety can be challenging. Practicing grounding techniques might help.",
         "metrics": {
-          "polarity": "Negative",
-          "keywords": "health anxiety issues",
+          "polarity": "negative",
+          "keywords": "health, anxiety, issues",
           "concerns": {
             "Anxiety": 4,
             "Career Confusion": 0,
@@ -213,8 +99,8 @@
     "recommendation": "Practice relaxation techniques and set a consistent sleep routine.",
     "final_persona": "Relaxed Explorer",
     "metrics": {
-      "polarity": "Positive",
-      "keywords": "sleep health anxiety routine",
+      "polarity": "negative",
+      "average_keywords": "sleep, health, anxiety, routine",
       "concerns": {
         "Anxiety": 3,
         "Career Confusion": 0,
@@ -224,6 +110,120 @@
         "Insomnia": 3.5,
         "Positive Outlook": 1,
         "Stress": 1.5
+      }
+    }
+  },
+  {
+    "start_time": "2024-10-27T10:00:00",
+    "messages": [
+      {
+        "question": "I'm struggling with motivation for my projects.",
+        "response": "It's tough to stay motivated sometimes. Have you thought about breaking your projects into smaller tasks?",
+        "metrics": {
+          "polarity": "negative",
+          "keywords": "motivation, projects, struggling",
+          "concerns": {
+            "Anxiety": 2,
+            "Career Confusion": 3,
+            "Depression": 2,
+            "Eating Disorder": 0,
+            "Health Anxiety": 0,
+            "Insomnia": 1,
+            "Positive Outlook": 1,
+            "Stress": 3
+          }
+        }
+      },
+      {
+        "question": "I feel like I'm not making progress.",
+        "response": "Feeling stuck can be frustrating. Consider tracking your progress to see how far you've come.",
+        "metrics": {
+          "polarity": "negative",
+          "keywords": "progress, stuck, frustration",
+          "concerns": {
+            "Anxiety": 3,
+            "Career Confusion": 2,
+            "Depression": 2,
+            "Eating Disorder": 0,
+            "Health Anxiety": 0,
+            "Insomnia": 0,
+            "Positive Outlook": 0,
+            "Stress": 4
+          }
+        }
+      }
+    ],
+    "recommendation": "Set short-term goals and celebrate small achievements.",
+    "final_persona": "Determined Achiever",
+    "metrics": {
+      "polarity": "negative",
+      "average_keywords": "motivation, projects, progress",
+      "concerns": {
+        "Anxiety": 2.5,
+        "Career Confusion": 2.5,
+        "Depression": 2,
+        "Eating Disorder": 0,
+        "Health Anxiety": 0,
+        "Insomnia": 0.5,
+        "Positive Outlook": 0.5,
+        "Stress": 3.5
+      }
+    }
+  },
+  {
+    "start_time": "2024-10-27T11:00:00",
+    "messages": [
+      {
+        "question": "I have a lot of deadlines coming up.",
+        "response": "Deadlines can create a lot of pressure. Have you tried prioritizing your tasks?",
+        "metrics": {
+          "polarity": "negative",
+          "keywords": "deadlines, pressure, tasks",
+          "concerns": {
+            "Anxiety": 4,
+            "Career Confusion": 1,
+            "Depression": 0,
+            "Eating Disorder": 0,
+            "Health Anxiety": 0,
+            "Insomnia": 2,
+            "Positive Outlook": 1,
+            "Stress": 5
+          }
+        }
+      },
+      {
+        "question": "I'm finding it hard to balance work and personal life.",
+        "response": "Finding balance is important. Have you considered setting boundaries for work time?",
+        "metrics": {
+          "polarity": "negative",
+          "keywords": "balance, work, personal life",
+          "concerns": {
+            "Anxiety": 3,
+            "Career Confusion": 2,
+            "Depression": 0,
+            "Eating Disorder": 0,
+            "Health Anxiety": 0,
+            "Insomnia": 1,
+            "Positive Outlook": 2,
+            "Stress": 4
+          }
+        }
+      }
+    ],
+    "recommendation": "Implement time management strategies to balance your workload.",
+    "final_persona": "Busy Juggler",
+    "metrics": {
+      "polarity": "negative",
+      "average_keywords": "deadlines, balance, pressure",
+      "concerns": {
+        "Anxiety": 3.5,
+        "Career Confusion": 1.5,
+        "Depression": 0,
+        "Eating Disorder": 0,
+        "Health Anxiety": 0,
+        "Insomnia": 1.5,
+        "Positive Outlook": 1.5,
+        "Stress": 4.5
       }
     }
   }
