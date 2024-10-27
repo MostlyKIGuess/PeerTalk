@@ -45,6 +45,9 @@ export default function Home() {
   const [last_session_recommendation, setLastSessionRecommendation] =
     useState("");
   const [last_session_persona, setLastSessionPersona] = useState("");
+  const [sessionEnded, setSessionEnded] = useState(false);
+  const [recommendation, setRecommendation] = useState("");
+  const [isLoadingRecommendation, setIsLoadingRecommendation] = useState(false);
 
   const getSystemInstruction = (isReturningUser: boolean) => {
     return isReturningUser
@@ -156,9 +159,9 @@ export default function Home() {
       const answer = input;
 
       console.log(keystrokes, backspaces, typingSpeed);
-     
+
       setIsGenerating(false);
-      
+
       await fetch("http://localhost:8000/api/messages/send", {
         method: "POST",
         headers: {
@@ -193,6 +196,27 @@ export default function Home() {
       if (isGenerating || !input) return;
       setIsGenerating(true);
       handleSubmit(e as unknown as React.FormEvent<HTMLFormElement>);
+    }
+  };
+
+  const handleEndSession = async () => {
+    setIsLoadingRecommendation(true);
+    try {
+      const response = await fetch("http://localhost:8000/api/session/end", {
+        method: "GET",
+      });
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const data = await response.json();
+      setRecommendation(data.recommendation);
+      setSessionEnded(true);
+    } catch (error) {
+      console.error("Error ending session:", error);
+    } finally {
+      setIsLoadingRecommendation(false);
     }
   };
 
@@ -256,6 +280,26 @@ export default function Home() {
             <ChatBubbleMessage isLoading />
           </ChatBubble>
         )}
+
+        {/* Session Ended */}
+        {sessionEnded && (
+          <div className="w-full bg-background shadow-sm border rounded-lg p-8 flex flex-col gap-2">
+            <h1 className="font-bold">Session Ended</h1>
+            <p className="text-muted-foreground text-sm">
+              Here is our recommendation: {recommendation}
+            </p>
+          </div>
+        )}
+
+        {/* Loading Recommendation */}
+        {isLoadingRecommendation && (
+          <div className="w-full bg-background shadow-sm border rounded-lg p-8 flex flex-col gap-2">
+            <h1 className="font-bold">Ending Session...</h1>
+            <p className="text-muted-foreground text-sm">
+              Please wait while we fetch your recommendation.
+            </p>
+          </div>
+        )}
       </ChatMessageList>
       <div className="w-full px-4">
         <form
@@ -282,11 +326,7 @@ export default function Home() {
           <Button
             size="sm"
             type="button"
-            onClick={async () => {
-              await fetch("http://localhost:8000/api/session/end", {
-                method: "GET",
-              });
-            }}
+            onClick={handleEndSession}
             className="ml-2 gap-1.5 flex align-center mr-2"
           >
             End
