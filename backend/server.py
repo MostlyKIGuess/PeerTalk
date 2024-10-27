@@ -235,7 +235,7 @@ async def end_session():
             "keywords": keywords,
             "concerns": category,
         }
-
+        user[-1]["final_persona"] = get_updated_persona(conv_hist)
         user[-1]["time_shift"] = time_shift_analysis(user)
         user[-1]["recommendation"] = get_recommendation(user)
 
