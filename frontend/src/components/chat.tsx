@@ -86,7 +86,7 @@ export default function Home() {
     if (messagesRef.current) {
       messagesRef.current.scrollTop = messagesRef.current.scrollHeight;
     }
-  }, [messages]);
+  }, [messages, sessionEnded, isLoadingRecommendation]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
