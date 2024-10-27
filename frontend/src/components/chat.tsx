@@ -8,9 +8,7 @@ import {
 import { ChatInput } from "@/components/ui/chat/chat-input";
 import { ChatMessageList } from "@/components/ui/chat/chat-message-list";
 import { Button } from "@/components/ui/button";
-import {
-  CornerDownLeft,
-} from "lucide-react";
+import { CornerDownLeft } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -40,7 +38,10 @@ export default function Home() {
     { role: "assistant", content: startingMessage },
   ]);
   const [input, setInput] = useState("");
-  const [isLoading] = useState(false);
+  const [keystrokes, setKeystrokes] = useState<number>(0);
+  const [backspaces, setBackspaces] = useState<number>(0);
+  const [typingStartTime, setTypingStartTime] = useState<number | null>(null);
+  const [typingSpeed, setTypingSpeed] = useState<number>(0); // words per minute
 
   const messagesRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
@@ -50,6 +51,36 @@ export default function Home() {
       messagesRef.current.scrollTop = messagesRef.current.scrollHeight;
     }
   }, [messages]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (typingStartTime === null) {
+        setTypingStartTime(Date.now());
+      }
+
+      if (event.key === "Backspace") {
+        setBackspaces((prev) => prev + 1);
+      } else {
+        setKeystrokes((prev) => prev + 1);
+      }
+    };
+
+    const calculateTypingSpeed = () => {
+      if (typingStartTime !== null) {
+        const elapsedTime = (Date.now() - typingStartTime) / 60000; // Convert to minutes
+        const wordsTyped = keystrokes / 5; // Approx. 5 characters per word
+        setTypingSpeed(wordsTyped / elapsedTime);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    // Cleanup event listener
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      calculateTypingSpeed();
+    };
+  }, [keystrokes, backspaces, typingStartTime]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInput(e.target.value);
@@ -68,7 +99,10 @@ export default function Home() {
 
     try {
       const context = updatedMessages
-        .map((msg) => `${msg.role === "user" ? "User" : "Assistant"}: ${msg.content}`)
+        .map(
+          (msg) =>
+            `${msg.role === "user" ? "User" : "Assistant"}: ${msg.content}`
+        )
         .join("\n");
 
       const result = await model.generateContent(context);
@@ -81,8 +115,17 @@ export default function Home() {
       setMessages(finalMessages);
       console.log("aiMessage.content", aiMessage.content);
 
-      const question = messages.length > 1 ? messages[messages.length - 1].content : startingMessage;
+      const question =
+        messages.length > 1
+          ? messages[messages.length - 1].content
+          : startingMessage;
       const answer = input;
+
+      console.log(keystrokes, backspaces, typingSpeed);
+      const previousAIMessage =
+        messages.length > 1
+          ? messages[messages.length - 1].content
+          : startingMessage;
 
       await fetch("http://localhost:8000/api/messages/send", {
         method: "POST",
@@ -92,6 +135,12 @@ export default function Home() {
         body: JSON.stringify({
           question: question,
           response: answer,
+          previous_ai_message: previousAIMessage,
+          typing_metrics: {
+            keystrokes,
+            backspaces,
+            typing_speed: typingSpeed,
+          },
           timestamp: new Date().toISOString(),
         }),
       });
@@ -99,13 +148,18 @@ export default function Home() {
       console.error("Error generating response:", error);
     } finally {
       setIsGenerating(false);
+      // Reset typing metrics
+      setKeystrokes(0);
+      setBackspaces(0);
+      setTypingStartTime(null);
+      setTypingSpeed(0);
     }
   };
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      if (isGenerating || isLoading || !input) return;
+      if (isGenerating || !input) return;
       setIsGenerating(true);
       handleSubmit(e as unknown as React.FormEvent<HTMLFormElement>);
     }
@@ -157,11 +211,7 @@ export default function Home() {
                 {message.role === "assistant" &&
                   messages.length - 1 === index && (
                     <div className="flex items-center mt-1.5 gap-1">
-                      {!isGenerating && (
-                        <>
-                       
-                        </>
-                      )}
+                      {!isGenerating && <></>}
                     </div>
                   )}
               </ChatBubbleMessage>
@@ -190,7 +240,7 @@ export default function Home() {
             className="min-h-12 resize-none rounded-lg bg-background border-0 p-3 shadow-none focus-visible:ring-0 flex-grow"
           />
           <Button
-            disabled={!input || isLoading}
+            disabled={!input}
             type="submit"
             size="sm"
             className="ml-2 gap-1.5 flex align-center mr-2"
