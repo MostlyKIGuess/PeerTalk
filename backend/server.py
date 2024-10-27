@@ -28,22 +28,10 @@ app.add_middleware(
 
 
 class Message(BaseModel):
-    response: str
     question: str
+    response: str
     timestamp: str
-
-# # Initialize a list to store messages
-# messages_list = []
-
-# # Load existing messages from the JSON file if it exists
-# if os.path.exists("messages.json"):
-#     try:
-#         with open("messages.json", "r") as f:
-#             messages_list = json.load(f)
-#             if not isinstance(messages_list, list):
-#                 messages_list = []
-#     except json.JSONDecodeError:
-#         messages_list = []
+    typing_metrics: str
 
 
 def get_user():
@@ -68,11 +56,13 @@ def append_message(user, message):
 @app.post("/api/messages/send")
 async def send_message(msg: Message):
     # Create a timestamp for the message
+    print(msg)
     timestamp = datetime.now().isoformat()
     # Store the incoming user message and the AI's response
     response = msg.response
     question = msg.question
     polarity, keywords, category = evaluate_response(response, question)
+    typing_metrics = json.loads(msg.typing_metrics)
 
     # Structure message with metrics
     new_message = {
@@ -83,7 +73,8 @@ async def send_message(msg: Message):
             "polarity": polarity,
             "keywords": keywords,
             "concerns": category,
-        }
+        },
+        "typing_metrics": typing_metrics
     }
 
     # Append the message to the list
@@ -137,9 +128,9 @@ async def start_session():
     return ret_val
 
 
-
 concerns = ['Stress', 'Depression', 'Bipolar disorder',
             'Anxiety', 'PTSD', 'ADHD', 'Insomnia']
+
 
 def evaluate_response(user_response, question=None):
     messages = [{"role": "system", "content": POLARITY_TEMPLATE}]
@@ -177,9 +168,6 @@ def evaluate_response(user_response, question=None):
     )
     category = eval(category_response.choices[0].message.content)
     category = {concern: category.get(concern, 0) for concern in concerns}
-    # print(polarity)
-    # print(keywords)
-    # print(category)
     return polarity, keywords, category
 
 
@@ -250,6 +238,17 @@ async def end_session():
 
         user[-1]["time_shift"] = time_shift_analysis(user)
         user[-1]["recommendation"] = get_recommendation(user)
+
+        avg_keystrokes = sum(
+            [msg["typing_metrics"]["keystrokes"] for msg in user[-1]["messages"]]) / len(user[-1]["messages"])
+        avg_backspaces = sum(
+            [msg["typing_metrics"]["backspaces"] for msg in user[-1]["messages"]]) / len(user[-1]["messages"])
+        avg_speed = sum(
+            [msg["typing_metrics"]["typingSpeed"] for msg in user[-1]["messages"]]) / len(user[-1]["messages"])
+
+        user[-1]["metrics"]["keystrokes"] = avg_keystrokes
+        user[-1]["metrics"]["backspaces"] = avg_backspaces
+        user[-1]["metrics"]["speed"] = avg_speed
 
         with open("user.json", "w") as f:
             json.dump(user, f)

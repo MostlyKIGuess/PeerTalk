@@ -170,11 +170,11 @@ export default function Home() {
         body: JSON.stringify({
           question: question,
           response: answer,
-          typing_metrics: {
-            keystrokes,
-            backspaces,
-            typing_speed: typingSpeed,
-          },
+          typing_metrics: JSON.stringify({
+            keystrokes: keystrokes,
+            backspaces: backspaces,
+            typingSpeed: typingSpeed,
+          }),
           timestamp: new Date().toISOString(),
         }),
       });
