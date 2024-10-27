@@ -16,10 +16,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 class Message(BaseModel):
     response: str
     question: str
     timestamp: str
+
 
 # Initialize a list to store messages
 messages_list = []
@@ -34,6 +36,7 @@ if os.path.exists("messages.json"):
     except json.JSONDecodeError:
         messages_list = []
 
+
 @app.post("/api/messages/send")
 async def send_message(msg: Message):
     # Create a timestamp for the message
@@ -41,10 +44,10 @@ async def send_message(msg: Message):
     # Store the incoming user message and the AI's response
     response_message = msg.response
     question = msg.question
-    
+
     # Create a new message object
     new_message = {
-       "response": response_message,
+        "response": response_message,
         "question": question,
         "timestamp": timestamp,
     }
@@ -58,10 +61,59 @@ async def send_message(msg: Message):
 
     return {"success": True, "receivedMessage": response_message}
 
+
 @app.get("/api/messages")
 async def get_messages():
     return {"messages": messages_list}
 
+
+@app.get("/api/startsession")
+async def start_session():
+    messages_list.clear()
+    user = None
+    ret_val = None
+    if os.path.exists("user.json"):
+        with open("user.json", "r") as f:
+            try:
+                user = json.load(f)
+                if len(user) == 0:
+                    user = None
+            except json.JSONDecodeError:
+                user = None
+
+    if user:
+        ret_val = {
+            "oldUser": True,
+            "recommendation": user[-1]["recommendation"],
+            "final_persona": user[-1]["final_persona"],
+        }
+        user.append(
+            {
+                "start_time": datetime.now().isoformat(),
+                "messages": [],
+                "recommendation": "",
+                "final_persona": "",
+                "metrics": {},
+            }
+        )
+    else:
+        ret_val = {"oldUser": False}
+        user = [
+            {
+                "start_time": datetime.now().isoformat(),
+                "messages": [],
+                "recommendation": "",
+                "final_persona": "",
+                "metrics": {},
+            }
+        ]
+
+    with open("user.json", "w") as f:
+        json.dump(user, f)
+    return ret_val
+
+
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8000)  # Change port if necessary
