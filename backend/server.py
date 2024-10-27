@@ -4,6 +4,8 @@ from pydantic import BaseModel
 import json
 from datetime import datetime
 import os
+from postprocessing import evaluate_response
+
 
 app = FastAPI()
 
@@ -17,11 +19,11 @@ app.add_middleware(
 )
 
 
+
 class Message(BaseModel):
     response: str
     question: str
     timestamp: str
-
 
 # Initialize a list to store messages
 messages_list = []
@@ -42,14 +44,20 @@ async def send_message(msg: Message):
     # Create a timestamp for the message
     timestamp = datetime.now().isoformat()
     # Store the incoming user message and the AI's response
-    response_message = msg.response
+    response = msg.response
     question = msg.question
+    polarity, keywords, category = evaluate_response(response, question)
 
-    # Create a new message object
+    # Structure message with metrics
     new_message = {
-        "response": response_message,
-        "question": question,
         "timestamp": timestamp,
+        "question": question,
+        "response": response,
+        "metrics": {
+            "polarity": polarity,
+            "keywords": keywords,
+            "concerns": category,
+        }
     }
 
     # Append the new message to the list
@@ -59,7 +67,8 @@ async def send_message(msg: Message):
     with open("messages.json", "w") as f:
         json.dump(messages_list, f, indent=4)
 
-    return {"success": True, "receivedMessage": response_message}
+    return {"success": True, "receivedMessage": response}
+
 
 
 @app.get("/api/messages")
@@ -117,3 +126,4 @@ if __name__ == "__main__":
     import uvicorn
 
     uvicorn.run(app, host="0.0.0.0", port=8000)  # Change port if necessary
+

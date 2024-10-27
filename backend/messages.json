@@ -3,5 +3,99 @@
         "response": "hi",
         "question": "How are you doing?",
         "timestamp": "2024-10-27T05:21:23.117318"
+    },
+    {
+        "response": "helo",
+        "question": "Hey there!  It's great to hear from you. \ud83d\ude0a  What's on your mind today?  Anything you'd like to chat about? \n",
+        "timestamp": "2024-10-27T05:50:52.139462"
+    },
+    {
+        "response": "helo",
+        "question": "Hey there! \ud83d\udc4b  It's great to hear from you.  It looks like you're a little quiet today.  Is everything okay?  \ud83d\ude0a  Feel free to share whatever's on your mind, or just tell me about your day. \n",
+        "timestamp": "2024-10-27T05:51:47.149181"
+    },
+    {
+        "response": "hel",
+        "question": "Hey there! \ud83d\udc4b  It's great to hear from you.  It looks like you're a little quiet today.  Is everything okay?  \ud83d\ude0a  Feel free to share whatever's on your mind, or just tell me about your day. \n",
+        "timestamp": "2024-10-27T05:58:48.620771"
+    },
+    {
+        "response": "wanna kill ",
+        "question": "Assistant: Hey!  It's good to hear from you.  You seem a little shy today.  \ud83d\ude0a   Anything going on that you want to talk about?  I'm here to listen. \n",
+        "timestamp": "2024-10-27T05:58:58.915565"
+    },
+    {
+        "timestamp": "2024-10-27T06:01:30.987691",
+        "question": "Whoa, that's a pretty strong statement!  It sounds like you're feeling really angry or frustrated.  Is there something specific that's bothering you?  Talking about it might help you feel a little better. \n",
+        "response": "Hello",
+        "metrics": {
+            "polarity": 0,
+            "keywords": [],
+            "concerns": {
+                "Stress": 0,
+                "Depression": 0,
+                "Bipolar disorder": 0,
+                "Anxiety": 0,
+                "PTSD": 0,
+                "ADHD": 0,
+                "Insomnia": 0
+            }
+        }
+    },
+    {
+        "timestamp": "2024-10-27T06:01:47.863248",
+        "question": "Hey there!  It's great to hear from you. \ud83d\ude0a  It sounds like you've got a lot on your mind.  Is there anything you'd like to share?  I'm here to listen without judgment. \n",
+        "response": "wanna kill myself",
+        "metrics": {
+            "polarity": -1,
+            "keywords": [
+                "wanna kill myself"
+            ],
+            "concerns": {
+                "Stress": 0,
+                "Depression": 9,
+                "Bipolar disorder": 0,
+                "Anxiety": 0,
+                "PTSD": 0,
+                "ADHD": 0,
+                "Insomnia": 0
+            }
+        }
+    },
+    {
+        "timestamp": "2024-10-27T06:02:05.870885",
+        "question": "Whoa, that's a serious thing to say. It sounds like you're hurting deeply right now. I'm here to listen without judgment.  Is there anything you'd like to talk about?  What's making you feel this way?  It's okay to not be okay, and talking about it could help.  Remember, you're not alone, and there are people who care about you and want to help. \n",
+        "response": "No",
+        "metrics": {
+            "polarity": 0,
+            "keywords": [],
+            "concerns": {
+                "Stress": 0,
+                "Depression": 0,
+                "Bipolar disorder": 0,
+                "Anxiety": 0,
+                "PTSD": 0,
+                "ADHD": 0,
+                "Insomnia": 0
+            }
+        }
+    },
+    {
+        "timestamp": "2024-10-27T06:02:35.479079",
+        "question": "Assistant:  Okay, I understand.  It's okay if you don't want to talk right now.  But please know that I'm here for you if you change your mind, or if you just need someone to listen.  You're not alone.  There are people who care about you.  Is there anything else you'd like to chat about?  Maybe something lighter?  \ud83d\ude0a \n",
+        "response": "exit",
+        "metrics": {
+            "polarity": 0,
+            "keywords": [],
+            "concerns": {
+                "Stress": 0,
+                "Depression": 0,
+                "Bipolar disorder": 0,
+                "Anxiety": 0,
+                "PTSD": 0,
+                "ADHD": 0,
+                "Insomnia": 0
+            }
+        }
     }
 ]
