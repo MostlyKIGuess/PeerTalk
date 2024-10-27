@@ -4,6 +4,8 @@ from pydantic import BaseModel
 import json
 from datetime import datetime
 import os
+from postprocessing import evaluate_response
+
 
 app = FastAPI()
 
@@ -16,10 +18,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 class Message(BaseModel):
     response: str
     question: str
     timestamp: str
+
 
 # Initialize a list to store messages
 messages_list = []
@@ -34,19 +38,26 @@ if os.path.exists("messages.json"):
     except json.JSONDecodeError:
         messages_list = []
 
+
 @app.post("/api/messages/send")
 async def send_message(msg: Message):
     # Create a timestamp for the message
     timestamp = datetime.now().isoformat()
     # Store the incoming user message and the AI's response
-    response_message = msg.response
+    response = msg.response
     question = msg.question
-    
-    # Create a new message object
+    polarity, keywords, category = evaluate_response(response, question)
+
+    # Structure message with metrics
     new_message = {
-       "response": response_message,
-        "question": question,
         "timestamp": timestamp,
+        "question": question,
+        "response": response,
+        "metrics": {
+            "polarity": polarity,
+            "keywords": keywords,
+            "concerns": category,
+        }
     }
 
     # Append the new message to the list
@@ -56,7 +67,8 @@ async def send_message(msg: Message):
     with open("messages.json", "w") as f:
         json.dump(messages_list, f, indent=4)
 
-    return {"success": True, "receivedMessage": response_message}
+    return {"success": True, "receivedMessage": response}
+
 
 @app.get("/api/messages")
 async def get_messages():
