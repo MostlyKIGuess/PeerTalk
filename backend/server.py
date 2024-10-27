@@ -65,7 +65,6 @@ def append_message(user, message):
 @app.post("/api/messages/send")
 async def send_message(msg: Message):
     # Create a timestamp for the message
-    print(msg)
     timestamp = datetime.now().isoformat()
     # Store the incoming user message and the AI's response
     response = msg.response
@@ -111,15 +110,18 @@ async def start_session():
             "recommendation": user[-1]["recommendation"],
             "final_persona": user[-1]["final_persona"],
         }
-        user.append(
-            {
-                "start_time": datetime.now().isoformat(),
-                "messages": [],
-                "recommendation": "",
-                "final_persona": "",
-                "metrics": {},
-            }
-        )
+        if len(user) > 1 and user[-1]["final_persona"] == "":
+            user[-1]["start_time"] = datetime.now().isoformat()
+        else:
+            user.append(
+                {
+                    "start_time": datetime.now().isoformat(),
+                    "messages": [],
+                    "recommendation": "",
+                    "final_persona": "",
+                    "metrics": {},
+                }
+            )
     else:
         ret_val = {"oldUser": False}
         user = [
@@ -282,9 +284,7 @@ async def end_session():
     if user:
         conv_hist = ""
         for message in user[-1]["messages"]:
-            conv_hist += (
-                f"Assistant: {message['question']}\nUser: {message['response']}\n"
-            )
+            conv_hist += f"Assistant: {message['question']}\nUser: {message['response']}\n"
 
         print(conv_hist)
 
@@ -295,6 +295,7 @@ async def end_session():
             "concerns": category,
         }
 
+        user[-1]["final_persona"] = get_updated_persona(conv_hist)
         user[-1]["time_shift"] = time_shift_analysis(user)
         user[-1]["recommendation"] = get_recommendation(user)
 
