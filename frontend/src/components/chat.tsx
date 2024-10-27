@@ -313,9 +313,10 @@ export default function Home() {
             onChange={handleInputChange}
             placeholder="Type your message here..."
             className="min-h-12 resize-none rounded-lg bg-background border-0 p-3 shadow-none focus-visible:ring-0 flex-grow"
+            disabled={sessionEnded} // Disable input if session has ended
           />
           <Button
-            disabled={!input}
+            disabled={!input || sessionEnded} // Disable button if session has ended
             type="submit"
             size="sm"
             className="ml-2 gap-1.5 flex align-center mr-2"
@@ -328,6 +329,7 @@ export default function Home() {
             type="button"
             onClick={handleEndSession}
             className="ml-2 gap-1.5 flex align-center mr-2"
+            disabled={sessionEnded} // Disable button if session has ended
           >
             End
           </Button>

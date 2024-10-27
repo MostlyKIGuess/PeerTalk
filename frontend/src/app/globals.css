@@ -70,3 +70,12 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+.no-scrollbar {
+  overflow-y: scroll; /* Ensure vertical scrolling is enabled */
+  scrollbar-width: none; /* Firefox */
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, and Opera */
+}
