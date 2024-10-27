@@ -5,16 +5,7 @@ from datetime import datetime
 from prompt_template import POLARITY_TEMPLATE, KEYWORDS_TEMPLATE, CATEGORY_TEMPLATE
 
 
-# # Set up API key (ensure it's added as an environment variable)
-# os.environ["API_KEY"] = "AIzaSyAD3Tfv9aCP1G_9CxE4Lkt9riv8z_81gGU"  # Replace with your actual API key
-# genai.configure(api_key=os.environ["API_KEY"])
 
-# # Initialize sessions list
-# sessions = []
-# current_session = {
-#     "start_time": None,
-#     "messages": []
-# }
 
 from openai import OpenAI
 from dotenv import load_dotenv
