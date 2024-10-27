@@ -21,6 +21,7 @@ if (!geminiApiKey) {
 }
 
 const genAI = new GoogleGenerativeAI(geminiApiKey);
+const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 interface Message {
   role: "user" | "assistant";
@@ -57,7 +58,7 @@ export default function Home() {
 
   // api call to /api/startsession
   useEffect(() => {
-    fetch("http://localhost:8000/api/session/start", {
+    fetch(`${backendUrl}/api/session/start`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -162,7 +163,7 @@ export default function Home() {
 
       setIsGenerating(false);
 
-      await fetch("http://localhost:8000/api/messages/send", {
+      await fetch(`${backendUrl}/api/messages/send`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -202,7 +203,7 @@ export default function Home() {
   const handleEndSession = async () => {
     setIsLoadingRecommendation(true);
     try {
-      const response = await fetch("http://localhost:8000/api/session/end", {
+      const response = await fetch(`${backendUrl}/api/session/end`, {
         method: "GET",
       });
 

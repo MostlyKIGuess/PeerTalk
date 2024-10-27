@@ -342,6 +342,12 @@ async def get_overalltimeshift():
     else:
         raise HTTPException(status_code=400, detail="Session not started")
 
+@app.get("/api/reset")
+async def reset():
+    if os.path.exists("user.json"):
+        os.remove("user.json")
+    return {"success": True}
+
 
 if __name__ == "__main__":
     import uvicorn

@@ -73,7 +73,7 @@ const concernColors: { [concern: string]: string } = {
   Insomnia: "#a0c4ff",
   ADHD: "#ffc6ff",
 };
-
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL ;
 const Page = () => {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [combinedAnalysis, setCombinedAnalysis] = useState<{
@@ -85,7 +85,7 @@ const Page = () => {
 
   useEffect(() => {
     const fetchSessions = async () => {
-      const response = await fetch("http://localhost:8000/api/session/summary");
+      const response = await fetch(`${backendUrl}/api/session/summary`);
       const data: Session[] = await response.json();
       setSessions(data);
       console.log(data);
@@ -109,7 +109,7 @@ const Page = () => {
   useEffect(() => {
     const fetchOverallTimeShift = async () => {
       const response = await fetch(
-        "http://localhost:8000/api/session/overalltimeshift"
+        `${backendUrl}/api/session/overalltimeshift`
       );
       const data = await response.json();
       setOverallTimeShift(data.time_shift);
