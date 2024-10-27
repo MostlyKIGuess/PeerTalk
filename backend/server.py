@@ -56,7 +56,6 @@ def append_message(user, message):
 @app.post("/api/messages/send")
 async def send_message(msg: Message):
     # Create a timestamp for the message
-    print(msg)
     timestamp = datetime.now().isoformat()
     # Store the incoming user message and the AI's response
     response = msg.response
@@ -236,6 +235,7 @@ async def end_session():
             "concerns": category,
         }
 
+        user[-1]["final_persona"] = get_updated_persona(conv_hist)
         user[-1]["time_shift"] = time_shift_analysis(user)
         user[-1]["recommendation"] = get_recommendation(user)
 
