@@ -4,12 +4,21 @@ from pydantic import BaseModel
 import json
 from datetime import datetime
 import os
+
 # from postprocessing import evaluate_response
-from prompt_template import PERSONA_TEMPLATE, TIMESHIFT_PERSONA_TEMPLATE, RECOMMENDATION_TEMPLATE, POLARITY_TEMPLATE, KEYWORDS_TEMPLATE, CATEGORY_TEMPLATE
+from prompt_template import (
+    PERSONA_TEMPLATE,
+    TIMESHIFT_PERSONA_TEMPLATE,
+    RECOMMENDATION_TEMPLATE,
+    POLARITY_TEMPLATE,
+    KEYWORDS_TEMPLATE,
+    CATEGORY_TEMPLATE,
+)
 
 
 from openai import OpenAI
 from dotenv import load_dotenv
+
 load_dotenv()
 api_key = os.getenv("OPENAI")
 client = OpenAI(api_key=api_key)
@@ -74,7 +83,7 @@ async def send_message(msg: Message):
             "keywords": keywords,
             "concerns": category,
         },
-        "typing_metrics": typing_metrics
+        "typing_metrics": typing_metrics,
     }
 
     # Append the message to the list
@@ -128,20 +137,31 @@ async def start_session():
     return ret_val
 
 
-concerns = ['Stress', 'Depression', 'Bipolar disorder',
-            'Anxiety', 'PTSD', 'ADHD', 'Insomnia']
+concerns = [
+    "Stress",
+    "Depression",
+    "Bipolar disorder",
+    "Anxiety",
+    "PTSD",
+    "ADHD",
+    "Insomnia",
+]
 
 
 def evaluate_response(user_response, question=None):
     messages = [{"role": "system", "content": POLARITY_TEMPLATE}]
     if question:
-        messages.append({"role": "user", "content": f"Question: {question}\nUser response: {user_response}"})
+        messages.append(
+            {
+                "role": "user",
+                "content": f"Question: {question}\nUser response: {user_response}",
+            }
+        )
     else:
         messages.append({"role": "user", "content": user_response})
 
     polarity_response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=messages
+        model="gpt-4o-mini", messages=messages
     )
     try:
         polarity = int(polarity_response.choices[0].message.content.strip())
@@ -153,8 +173,8 @@ def evaluate_response(user_response, question=None):
         model="gpt-4o-mini",
         messages=[
             {"role": "system", "content": KEYWORDS_TEMPLATE},
-            {"role": "user", "content": user_response}
-        ]
+            {"role": "user", "content": user_response},
+        ],
     )
     keywords = eval(keywords_response.choices[0].message.content)
 
@@ -163,8 +183,8 @@ def evaluate_response(user_response, question=None):
         model="gpt-4o-mini",
         messages=[
             {"role": "system", "content": CATEGORY_TEMPLATE},
-            {"role": "user", "content": str(keywords)}
-        ]
+            {"role": "user", "content": str(keywords)},
+        ],
     )
     category = eval(category_response.choices[0].message.content)
     category = {concern: category.get(concern, 0) for concern in concerns}
@@ -183,8 +203,10 @@ def get_updated_persona(conversation):
 
     persona_response = client.chat.completions.create(
         model="gpt-4o-mini",
-        messages=[{"role": "system", "content": PERSONA_TEMPLATE},
-                  {"role": "user", "content": user_prompt}]
+        messages=[
+            {"role": "system", "content": PERSONA_TEMPLATE},
+            {"role": "user", "content": user_prompt},
+        ],
     )
 
     persona = persona_response.choices[0].message.content
@@ -194,13 +216,45 @@ def get_updated_persona(conversation):
 def time_shift_analysis(user):
     if len(user) < 2:
         return "Not enough data for time shift analysis"
-    user_prompt = "Initial persona: " + user[-2]["final_persona"] + "\n" + \
-        "Updated persona: " + user[-1]["final_persona"] + "\n"
+    user_prompt = (
+        "Initial persona: "
+        + user[-2]["final_persona"]
+        + "\n"
+        + "Updated persona: "
+        + user[-1]["final_persona"]
+        + "\n"
+    )
 
     time_shift_response = client.chat.completions.create(
         model="gpt-4o-mini",
-        messages=[{"role": "system", "content": TIMESHIFT_PERSONA_TEMPLATE},
-                  {"role": "user", "content": user_prompt}]
+        messages=[
+            {"role": "system", "content": TIMESHIFT_PERSONA_TEMPLATE},
+            {"role": "user", "content": user_prompt},
+        ],
+    )
+
+    time_shift = time_shift_response.choices[0].message.content
+    return time_shift
+
+
+def time_shift_analysis_overall(user):
+    if len(user) < 2:
+        return "Not enough data for time shift analysis"
+    user_prompt = (
+        "Initial persona: "
+        + user[0]["final_persona"]
+        + "\n"
+        + "Updated persona: "
+        + user[-1]["final_persona"]
+        + "\n"
+    )
+
+    time_shift_response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content": TIMESHIFT_PERSONA_TEMPLATE},
+            {"role": "user", "content": user_prompt},
+        ],
     )
 
     time_shift = time_shift_response.choices[0].message.content
@@ -211,12 +265,15 @@ def get_recommendation(user):
     user_prompt = "Current persona: " + user[-1]["final_persona"] + "\n"
     recommendation_response = client.chat.completions.create(
         model="gpt-4o-mini",
-        messages=[{"role": "system", "content": RECOMMENDATION_TEMPLATE},
-                  {"role": "user", "content": user_prompt}]
+        messages=[
+            {"role": "system", "content": RECOMMENDATION_TEMPLATE},
+            {"role": "user", "content": user_prompt},
+        ],
     )
 
     recommendation = recommendation_response.choices[0].message.content
     return recommendation
+
 
 @app.get("/api/session/end")
 async def end_session():
@@ -225,7 +282,9 @@ async def end_session():
     if user:
         conv_hist = ""
         for message in user[-1]["messages"]:
-            conv_hist += f"Assistant: {message['question']}\nUser: {message['response']}\n"
+            conv_hist += (
+                f"Assistant: {message['question']}\nUser: {message['response']}\n"
+            )
 
         print(conv_hist)
 
@@ -240,11 +299,14 @@ async def end_session():
         user[-1]["recommendation"] = get_recommendation(user)
 
         avg_keystrokes = sum(
-            [msg["typing_metrics"]["keystrokes"] for msg in user[-1]["messages"]]) / len(user[-1]["messages"])
+            [msg["typing_metrics"]["keystrokes"] for msg in user[-1]["messages"]]
+        ) / len(user[-1]["messages"])
         avg_backspaces = sum(
-            [msg["typing_metrics"]["backspaces"] for msg in user[-1]["messages"]]) / len(user[-1]["messages"])
+            [msg["typing_metrics"]["backspaces"] for msg in user[-1]["messages"]]
+        ) / len(user[-1]["messages"])
         avg_speed = sum(
-            [msg["typing_metrics"]["typingSpeed"] for msg in user[-1]["messages"]]) / len(user[-1]["messages"])
+            [msg["typing_metrics"]["typingSpeed"] for msg in user[-1]["messages"]]
+        ) / len(user[-1]["messages"])
 
         user[-1]["metrics"]["keystrokes"] = avg_keystrokes
         user[-1]["metrics"]["backspaces"] = avg_backspaces
@@ -253,17 +315,32 @@ async def end_session():
         with open("user.json", "w") as f:
             json.dump(user, f)
 
-        return {"success": True, "recommendation": user[-1]["recommendation"], "time_shift": user[-1]["time_shift"]}
+        return {
+            "success": True,
+            "recommendation": user[-1]["recommendation"],
+            "time_shift": user[-1]["time_shift"],
+        }
     else:
         raise HTTPException(status_code=400, detail="Session not started")
 
-# @app.get("/api/session/summary")
-# async def get_summary():
-#     user = get_user()
-#     if user:
-#         return user[-1]
-#     else:
-#         raise HTTPException(status_code=400, detail="Session not started")
+
+@app.get("/api/session/summary")
+async def get_summary():
+    user = get_user()
+    if user:
+        return user
+    else:
+        raise HTTPException(status_code=400, detail="Session not started")
+
+
+@app.get("/api/session/overalltimeshift")
+async def get_overalltimeshift():
+    user = get_user()
+    if user:
+        return {"time_shift": time_shift_analysis_overall(user)}
+    else:
+        raise HTTPException(status_code=400, detail="Session not started")
+
 
 if __name__ == "__main__":
     import uvicorn

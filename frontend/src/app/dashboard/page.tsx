@@ -38,8 +38,11 @@ type Message = {
   response: string;
   metrics: {
     polarity: string;
-    keywords: string;
+    keywords: string[];
     concerns: { [name: string]: number };
+    keystrokes: number;
+    backspaces: number;
+    speed: number;
   };
   timestamp: string;
 };
@@ -51,21 +54,21 @@ type Session = {
   final_persona: string;
   metrics: {
     polarity: string;
-    keywords: string;
+    keywords: string[];
     concerns: { [name: string]: number };
   };
+  time_shift: string;
 };
 
 // Define color mapping for concerns
 const concernColors: { [concern: string]: string } = {
-  Anxiety: "#ffadad",
-  "Career Confusion": "#ffd6a5",
+  Stress: "#ffadad",
   Depression: "#fdffb6",
-  "Eating Disorder": "#caffbf",
-  "Health Anxiety": "#9bf6ff",
+  "Bipolar disorder": "#caffbf",
+  Anxiety: "#9bf6ff",
+  PTSD: "#ffd6a5",
   Insomnia: "#a0c4ff",
-  "Positive Outlook": "#bdb2ff",
-  Stress: "#ffc6ff",
+  ADHD: "#ffc6ff",
 };
 
 const Page = () => {
@@ -79,9 +82,10 @@ const Page = () => {
 
   useEffect(() => {
     const fetchSessions = async () => {
-      const response = await fetch("/dummy_sessions.json");
+      const response = await fetch("http://localhost:8000/api/session/summary");
       const data: Session[] = await response.json();
       setSessions(data);
+      console.log(data);
 
       const timelineData = data.flatMap((session) => ({
         polarity: session.metrics.polarity,
@@ -96,6 +100,19 @@ const Page = () => {
     fetchSessions();
   }, []);
 
+  const [overallTimeShift, setOverallTimeShift] = useState<string>("");
+  useEffect(() => {
+    const fetchOverallTimeShift = async () => {
+      const response = await fetch(
+        "http://localhost:8000/api/session/overalltimeshift"
+      );
+      const data = await response.json();
+      setOverallTimeShift(data.time_shift);
+    };
+
+    fetchOverallTimeShift();
+  }, []);
+
   if (sessions.length === 0) {
     return <div>Loading...</div>;
   }
@@ -103,14 +120,14 @@ const Page = () => {
   // Prepare data for Line Chart with color-coded concerns
   const chartData = {
     // labels: combinedAnalysis.timeline.map(item => item.date),
-    labels: combinedAnalysis.timeline.map((_, index) => `Session ${index + 1}`),
+    labels: combinedAnalysis.timeline.map((_, index) => `Session ${index}`),
     datasets: [
       {
         label: "Polarity",
         data: combinedAnalysis.timeline.map((item) =>
-          item.polarity === "Positive"
+          item.polarity === "positive"
             ? 1
-            : item.polarity === "Negative"
+            : item.polarity === "negative"
             ? -1
             : 0
         ),
@@ -145,7 +162,7 @@ const Page = () => {
           <TabsList>
             {sessions.map((_, index) => (
               <TabsTrigger key={index} value={`session-${index}`}>
-                {`Session ${index + 1}`}
+                {`Session ${index}`}
               </TabsTrigger>
             ))}
           </TabsList>
@@ -160,7 +177,8 @@ const Page = () => {
                 </CardHeader>
                 <CardContent>
                   {session.messages.map((msg, idx) => (
-                    <div key={idx} className="my-4 border-b pb-4">
+                    // {{console.log(msg)}}
+                      <div key={idx} className="my-4 border-b pb-4">
                       <h3 className="text-lg font-bold">Message {idx + 1}</h3>
                       <p className="text-sm my-2">
                         <strong>Question:</strong> {msg.question}{" "}
@@ -168,38 +186,44 @@ const Page = () => {
                       <p className="text-sm my-2">
                         <strong>Response:</strong> {msg.response}
                       </p>
-                      <p className="text-sm my-2">
-                        <strong>Polarity:</strong> {msg.metrics.polarity}
-                      </p>
-                      <p className="text-sm my-2">
-                        <strong>Key Phrase:</strong> {msg.metrics.keywords}
-                      </p>
-                      <p className="text-sm my-2">
-                        <strong>Concerns:</strong>
-                      </p>
-                      <ul>
-                        {Object.entries(msg.metrics.concerns)
-                          .filter(([, intensity]) => intensity > 0)
-                          .map(([concern, intensity], j) => (
-                            <li
-                              key={j}
-                              className="flex items-center gap-2 my-1"
-                            >
-                              <span
-                                className="w-24"
-                                style={{ color: concernColors[concern] }}
-                              >
-                                {concern}
-                              </span>
-                              <Progress
-                                value={(intensity / 10) * 100}
-                                max={100}
-                                color={concernColors[concern]}
-                              />
-                              <span>{intensity}/10</span>
-                            </li>
-                          ))}
-                      </ul>
+                      <p>{index==0}</p>
+                      {(index != 0) && (
+                          <div>
+                          <p className="text-sm my-2">
+                            <strong>Polarity:</strong> {msg.metrics.polarity}
+                          </p>
+                          <p className="text-sm my-2">
+                            <strong>Key Phrase:</strong> {msg.metrics.keywords.join(", ")
+                            }
+                          </p>
+                          <p className="text-sm my-2">
+                            <strong>Concerns:</strong>
+                          </p>
+                          <ul>
+                            {Object.entries(msg.metrics.concerns)
+                              .filter(([, intensity]) => intensity > 0)
+                              .map(([concern, intensity], j) => (
+                                <li
+                                  key={j}
+                                  className="flex items-center gap-2 my-1"
+                                >
+                                  <span
+                                    className="w-24"
+                                    style={{ color: concernColors[concern] }}
+                                  >
+                                    {concern}
+                                  </span>
+                                  <Progress
+                                    value={(intensity / 10) * 100}
+                                    max={100}
+                                    color={concernColors[concern]}
+                                  />
+                                  <span>{intensity}/10</span>
+                                </li>
+                              ))}
+                          </ul>
+                        </div>
+                      )}
                     </div>
                   ))}
                   {/* Overall metrics */}
@@ -209,7 +233,7 @@ const Page = () => {
                       <strong>Polarity:</strong> {session.metrics.polarity}
                     </p>
                     <p className="text-sm my-2">
-                      <strong>Key Phrase:</strong> {session.metrics.keywords}
+                      <strong>Key Phrase:</strong> {session.metrics.keywords.join(", ")}
                     </p>
                     <p className="text-sm my-2">
                       <strong>Concerns:</strong>
@@ -234,6 +258,15 @@ const Page = () => {
                           </li>
                         ))}
                     </ul>
+                    <p className="text-sm my-2">
+                      <strong>Keystrokes:</strong> {session.metrics.keystrokes}
+                    </p>
+                    <p className="text-sm my-2">
+                      <strong>Backspaces:</strong> {session.metrics.backspaces}
+                    </p>
+                    <p className="text-sm my-2">
+                      <strong>Typing Speed:</strong> {session.metrics.speed} WPM
+                    </p>
                   </div>
                 </CardContent>
                 <CardFooter className="flex flex-col text-left justify-normal">
@@ -246,6 +279,11 @@ const Page = () => {
                     Recommendations
                   </h3>
                   <p className="text-left">{session.recommendation}</p>
+                  <p className="mt-4"></p>
+                  <h3 className="text-lg font-semibold text-left">
+                    Time Shift Analysis
+                  </h3>
+                  <p className="text-left">{session.time_shift}</p>
                 </CardFooter>
               </Card>
             </TabsContent>
@@ -261,19 +299,7 @@ const Page = () => {
           </CardHeader>
           <CardContent>
             <Line data={chartData} />
-            <p className="py-10 mt-16">
-              Lorem mollit sit pariatur enim labore exercitation do. Duis est
-              incididunt pariatur magna ea amet elit duis laborum occaecat duis
-              elit qui reprehenderit. Enim cillum adipisicing est mollit commodo
-              est proident adipisicing. Ullamco aute cillum id tempor ea id.
-              Nisi cupidatat commodo cupidatat aliquip laboris id occaecat
-              pariatur cupidatat do officia Lorem anim. Exercitation enim duis
-              reprehenderit mollit. In veniam sunt elit do irure consequat
-              ullamco. Ullamco id tempor qui ex nostrud eiusmod tempor sint
-              nulla reprehenderit ullamco. Et commodo amet in eiusmod cupidatat.
-              Quis eu anim irure elit anim ea excepteur ad duis et id id. Ut
-              nostrud consequat tempor veniam aliqua cupidatat qui excepteur.
-            </p>
+            <p className="py-10 mt-16">{overallTimeShift}</p>
           </CardContent>
         </Card>
       </div>
