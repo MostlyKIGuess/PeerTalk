@@ -1,4 +1,4 @@
 fastapi 
 uvicorn 
-transformers
-peft
+openai
+BaseModel
