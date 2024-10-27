@@ -238,8 +238,7 @@ async def end_session():
     if user:
         conv_hist = ""
         for message in user[-1]["messages"]:
-            conv_hist += f"Assistant: {message['question']
-                                       }\nUser: {message['response']}\n"
+            conv_hist += f"Assistant: {message['question']}\nUser: {message['response']}\n"
 
         print(conv_hist)
 
