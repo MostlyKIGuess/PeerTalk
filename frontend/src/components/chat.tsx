@@ -54,7 +54,7 @@ export default function Home() {
 
   // api call to /api/startsession
   useEffect(() => {
-    fetch("http://localhost:8000/api/startsession", {
+    fetch("http://localhost:8000/api/session/start", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -156,11 +156,9 @@ export default function Home() {
       const answer = input;
 
       console.log(keystrokes, backspaces, typingSpeed);
-      const previousAIMessage =
-        messages.length > 1
-          ? messages[messages.length - 1].content
-          : startingMessage;
-
+     
+      setIsGenerating(false);
+      
       await fetch("http://localhost:8000/api/messages/send", {
         method: "POST",
         headers: {
@@ -169,7 +167,6 @@ export default function Home() {
         body: JSON.stringify({
           question: question,
           response: answer,
-          previous_ai_message: previousAIMessage,
           typing_metrics: {
             keystrokes,
             backspaces,
