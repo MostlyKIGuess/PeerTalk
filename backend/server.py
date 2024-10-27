@@ -218,7 +218,6 @@ def get_recommendation(user):
     recommendation = recommendation_response.choices[0].message.content
     return recommendation
 
-
 @app.get("/api/session/end")
 async def end_session():
     print("Ending session")
@@ -226,8 +225,7 @@ async def end_session():
     if user:
         conv_hist = ""
         for message in user[-1]["messages"]:
-            conv_hist += f"Assistant: {message['question']
-                                       }\nUser: {message['response']}\n"
+            conv_hist += f"Assistant: {message['question']}\nUser: {message['response']}\n"
 
         print(conv_hist)
 
@@ -238,7 +236,6 @@ async def end_session():
             "concerns": category,
         }
 
-        user[-1]["final_persona"] = get_updated_persona(conv_hist)
         user[-1]["time_shift"] = time_shift_analysis(user)
         user[-1]["recommendation"] = get_recommendation(user)
 
@@ -256,10 +253,9 @@ async def end_session():
         with open("user.json", "w") as f:
             json.dump(user, f)
 
-        return {"success": True, "metrics": user[-1]["metrics"]}
+        return {"success": True, "recommendation": user[-1]["recommendation"], "time_shift": user[-1]["time_shift"]}
     else:
         raise HTTPException(status_code=400, detail="Session not started")
-
 
 # @app.get("/api/session/summary")
 # async def get_summary():
