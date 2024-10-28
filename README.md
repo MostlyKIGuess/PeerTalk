@@ -2,7 +2,7 @@
 
 ## Video Demo
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/2nsq_EA75ZY?si=b5v7x4vs-d9rTYUv&amp;start=21" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+[![Demo Video](https://img.youtube.com/vi/2nsq_EA75ZY/0.jpg)](https://www.youtube.com/watch?v=2nsq_EA75ZY)
 
 
 PeerTalk is an AI-powered mental health support platform designed to assist users in managing their mental health concerns. The platform leverages advanced natural language processing models to provide empathetic and informative guidance.
