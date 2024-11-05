@@ -22,6 +22,8 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import Markdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 ChartJS.register(
   LineElement,
@@ -73,7 +75,8 @@ const concernColors: { [concern: string]: string } = {
   Insomnia: "#a0c4ff",
   ADHD: "#ffc6ff",
 };
-  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL ;
+const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+
 const Page = () => {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [combinedAnalysis, setCombinedAnalysis] = useState<{
@@ -332,7 +335,9 @@ const Page = () => {
                   <h3 className="text-lg font-semibold text-left">
                     Recommendations
                   </h3>
-                  <p className="text-left">{session.recommendation}</p>
+                  <Markdown className="text-left" remarkPlugins={[remarkGfm]}>
+                    {session.recommendation}
+                  </Markdown>
                   <p className="mt-4"></p>
                   <h3 className="text-lg font-semibold text-left">
                     Time Shift Analysis
@@ -353,7 +358,10 @@ const Page = () => {
           </CardHeader>
           <CardContent>
             <Line data={chartData} />
-            <p className="py-10 mt-16">{overallTimeShift}</p>
+            <Markdown className="mt-4" remarkPlugins={[remarkGfm]}>
+              {overallTimeShift}
+            </Markdown>
+            {/* <p className="py-10 mt-16">{overallTimeShift}</p> */}
           </CardContent>
         </Card>
       </div>
