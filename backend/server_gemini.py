@@ -144,7 +144,7 @@ def evaluate_response(user_response, question=None):
         prompt = user_response
 
     # Polarity
-    full_prompt_polarity = f"{POLARITY_TEMPLATE}\n{prompt}\nPlease respond with only an integer value for polarity.Only an INTEGER value is expected."
+    full_prompt_polarity = f"{POLARITY_TEMPLATE}\n{prompt}\nPlease respond with only an integer value for polarity.Only an INTEGER value is expected. ONLY ANSWER IN -1 0 and 1."
     polarity_response = model.generate_content(full_prompt_polarity)
     try:
         polarity = int(polarity_response.text.strip())
