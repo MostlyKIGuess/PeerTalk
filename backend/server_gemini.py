@@ -138,31 +138,36 @@ concerns = [
 ]
 
 def evaluate_response(user_response, question=None):
-    messages = [{"role": "system", "content": POLARITY_TEMPLATE}]
     if question:
-        messages.append(
-            {
-                "role": "user",
-                "content": f"Question: {question}\nUser response: {user_response}",
-            }
-        )
+        prompt = f"Question: {question}\nUser response: {user_response}"
     else:
-        messages.append({"role": "user", "content": user_response})
+        prompt = user_response
 
-    polarity_response = model.generate_content("Explain how AI works")
+    # Polarity
+    full_prompt_polarity = f"{POLARITY_TEMPLATE}\n{prompt}\nPlease respond with only an integer value for polarity.Only an INTEGER value is expected."
+    polarity_response = model.generate_content(full_prompt_polarity)
     try:
         polarity = int(polarity_response.text.strip())
-    except (ValueError, IndexError, AttributeError) as e:
+    except (ValueError, AttributeError) as e:
         raise ValueError("Failed to parse polarity response") from e
 
-    # Extract keywords
-    keywords_response = model.generate_content(user_response)
-    keywords = eval(keywords_response.text)
+    # Keywords
+    full_prompt_keywords = f"{KEYWORDS_TEMPLATE}\n{user_response}\nPlease provide keywords as a comma-separated list. ONLY PLAIN TEXT RESPONSES CONTAINING KEYWORDS ARE EXPECTED WITH COMMAS."
+    keywords_response = model.generate_content(full_prompt_keywords)
+    try:
+        keywords = [kw.strip() for kw in keywords_response.text.split(",")]
+    except Exception as e:
+        raise ValueError("Failed to parse keywords response") from e
 
-    # Categorize response based on keywords
-    category_response = model.generate_content(str(keywords))
-    category = eval(category_response.text)
-    category = {concern: category.get(concern, 0) for concern in concerns}
+    # Category
+    full_prompt_category = f"{CATEGORY_TEMPLATE}\nKeywords: {', '.join(keywords)}\nPlease provide categories with scores. ONLY PLAIN TEXT RESPONSES CONTAINING CATEGORIES AND SCORES ARE EXPECTED."
+    category_response = model.generate_content(full_prompt_category)
+    try:
+        category = eval(category_response.text)
+        category = {concern: category.get(concern, 0) for concern in concerns}
+    except Exception as e:
+        raise ValueError("Failed to parse category response") from e
+
     return polarity, keywords, category
 
 def get_updated_persona(conversation):
