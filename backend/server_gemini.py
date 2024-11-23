@@ -291,6 +291,10 @@ async def reset():
         os.remove("user.json")
     return {"success": True}
 
+@app.get("/api/ping")
+async def ping():
+    return {"success": True}
+
 if __name__ == "__main__":
     import uvicorn
 

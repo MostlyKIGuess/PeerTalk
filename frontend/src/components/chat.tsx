@@ -287,7 +287,11 @@ export default function Home() {
           <div className="w-full bg-background shadow-sm border rounded-lg p-8 flex flex-col gap-2">
             <h1 className="font-bold">Session Ended</h1>
             <p className="text-muted-foreground text-sm">
-              Here is our recommendation: {recommendation}
+
+
+              Here is our recommendation: 
+              <Markdown>{recommendation}</Markdown>
+              {/* {recommendation} */}
             </p>
           </div>
         )}
